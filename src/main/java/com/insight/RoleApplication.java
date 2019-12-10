@@ -21,5 +21,4 @@ public class RoleApplication {
     public static void main(String[] args) {
         SpringApplication.run(RoleApplication.class, args);
     }
-
 }

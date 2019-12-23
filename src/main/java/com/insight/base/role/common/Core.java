@@ -46,32 +46,36 @@ public class Core {
      */
     @Transactional
     public void addRoleFromTemplate(RoleDto dto) {
-        Role role = mapper.getTemplate(dto.getAppId(), dto.getCode());
-        if (role == null){
-            logger.warn("未找到角色模板,初始化角色数据失败");
-
+        List<Role> roles = mapper.getTemplates(dto.getAppId());
+        if (roles == null || roles.isEmpty()) {
             return;
         }
 
         // 构造角色数据
-        String templateId = role.getId();
-        String id = Generator.uuid();
-        role.setId(id);
-        role.setTenantId(dto.getTenantId());
-        role.setRemark(null);
-        role.setBuiltin(false);
-        role.setCreator(dto.getCreator());
-        role.setCreatorId(dto.getCreatorId());
-        role.setCreatedTime(LocalDateTime.now());
-        addRole(role);
-
-        // 写入角色成员
         List<MemberDto> members = dto.getMembers();
-        addMembers(id, members);
+        for (Role role : roles) {
+            String templateId = role.getId();
+            String id = Generator.uuid();
+            role.setId(id);
+            role.setTenantId(dto.getTenantId());
+            role.setRemark(null);
+            role.setBuiltin(false);
+            role.setCreator(dto.getCreator());
+            role.setCreatorId(dto.getCreatorId());
+            role.setCreatedTime(LocalDateTime.now());
+            addRole(role);
 
-        // 读取模板权限并写入角色功能授权
-        List<FuncPermitDto> permits = mapper.getFuncPermits(templateId);
-        setFuncPermits(id, permits);
+            // 读取模板权限并写入角色功能授权
+            List<FuncPermitDto> permits = mapper.getFuncPermits(templateId);
+            setFuncPermits(id, permits);
+
+            // 写入角色成员
+            if (members == null || members.isEmpty()) {
+                continue;
+            }
+
+            addMembers(id, members);
+        }
     }
 
     /**

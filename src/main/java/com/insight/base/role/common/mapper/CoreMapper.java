@@ -21,11 +21,10 @@ public interface CoreMapper {
      * 获取角色模板
      *
      * @param appId 应用ID
-     * @param code  模板代码
      * @return 角色模板
      */
-    @Select("select * from ibr_role where app_id = #{appId} and code = #{code} and tenant_id is null;")
-    Role getTemplate(@Param("appId") String appId, @Param("code") String code);
+    @Select("select * from ibr_role where app_id = #{appId} and tenant_id is null;")
+    List<Role> getTemplates(String appId);
 
     /**
      * 获取模板角色功能授权集合

@@ -24,11 +24,6 @@ public class RoleDto implements Serializable {
     private String appId;
 
     /**
-     * 角色模板代码
-     */
-    private String code;
-
-    /**
      * 角色成员集合
      */
     private List<MemberDto> members;
@@ -57,14 +52,6 @@ public class RoleDto implements Serializable {
 
     public void setAppId(String appId) {
         this.appId = appId;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public List<MemberDto> getMembers() {

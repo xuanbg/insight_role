@@ -1,10 +1,10 @@
 package com.insight.base.role.common.mapper;
 
 import com.insight.base.role.common.dto.FuncPermitDto;
-import com.insight.base.role.common.dto.MemberDto;
 import com.insight.base.role.common.entity.Role;
 import com.insight.util.common.JsonTypeHandler;
 import com.insight.util.pojo.Log;
+import com.insight.util.pojo.MemberDto;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -53,7 +53,8 @@ public interface CoreMapper {
     @Insert("<script>insert ibr_role_member (id, type, role_id, member_id) values " +
             "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
             "(replace(uuid(), '-', ''), #{item.type}, #{id}, #{item.id})</foreach>;</script>")
-    void addMembers(@Param("id") String id, @Param("list") List<MemberDto> members);
+    void
+    addMembers(@Param("id") String id, @Param("list") List<MemberDto> members);
 
     /**
      * 添加角色功能授权

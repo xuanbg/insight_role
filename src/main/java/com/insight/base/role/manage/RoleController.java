@@ -1,11 +1,11 @@
 package com.insight.base.role.manage;
 
 import com.insight.base.role.common.dto.FuncPermitDto;
-import com.insight.base.role.common.dto.MemberDto;
 import com.insight.base.role.common.entity.Role;
 import com.insight.util.Json;
 import com.insight.util.ReplyHelper;
 import com.insight.util.pojo.LoginInfo;
+import com.insight.util.pojo.MemberDto;
 import com.insight.util.pojo.Reply;
 import org.springframework.web.bind.annotation.*;
 

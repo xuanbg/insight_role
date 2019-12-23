@@ -1,6 +1,6 @@
 package com.insight.base.role.common;
 
-import com.insight.base.role.common.dto.RoleDto;
+import com.insight.util.pojo.RoleDto;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ public class Listener {
      */
     @RabbitHandler
     @RabbitListener(queues = "insight.role")
-    public void receiveUser(RoleDto dto) {
+    public void receiveRole(RoleDto dto) {
         core.addRoleFromTemplate(dto);
     }
 }

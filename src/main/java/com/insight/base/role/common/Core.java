@@ -1,14 +1,10 @@
 package com.insight.base.role.common;
 
 import com.insight.base.role.common.dto.FuncPermitDto;
-import com.insight.base.role.common.dto.MemberDto;
-import com.insight.base.role.common.dto.RoleDto;
 import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.CoreMapper;
 import com.insight.util.Generator;
-import com.insight.util.pojo.Log;
-import com.insight.util.pojo.LoginInfo;
-import com.insight.util.pojo.OperateType;
+import com.insight.util.pojo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -52,16 +48,18 @@ public class Core {
         }
 
         // 构造角色数据
+        String tenantId = dto.getTenantId();
+        String creator = dto.getCreator();
+        String creatorId = dto.getCreatorId();
         List<MemberDto> members = dto.getMembers();
         for (Role role : roles) {
             String templateId = role.getId();
             String id = Generator.uuid();
             role.setId(id);
-            role.setTenantId(dto.getTenantId());
+            role.setTenantId(tenantId);
             role.setRemark(null);
-            role.setBuiltin(false);
-            role.setCreator(dto.getCreator());
-            role.setCreatorId(dto.getCreatorId());
+            role.setCreator(creator);
+            role.setCreatorId(creatorId);
             role.setCreatedTime(LocalDateTime.now());
             addRole(role);
 

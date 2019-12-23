@@ -9,6 +9,8 @@ import com.insight.util.Generator;
 import com.insight.util.pojo.Log;
 import com.insight.util.pojo.LoginInfo;
 import com.insight.util.pojo.OperateType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ import static com.insight.util.Generator.uuid;
  */
 @Component
 public class Core {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final CoreMapper mapper;
 
     /**
@@ -43,10 +46,15 @@ public class Core {
      */
     @Transactional
     public void addRoleFromTemplate(RoleDto dto) {
-        Role role = mapper.getTemplate(dto.getAppId());
-        String templateId = role.getId();
+        Role role = mapper.getTemplate(dto.getAppId(), dto.getCode());
+        if (role == null){
+            logger.warn("未找到角色模板,初始化角色数据失败");
+
+            return;
+        }
 
         // 构造角色数据
+        String templateId = role.getId();
         String id = Generator.uuid();
         role.setId(id);
         role.setTenantId(dto.getTenantId());

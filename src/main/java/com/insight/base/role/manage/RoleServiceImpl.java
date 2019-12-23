@@ -14,7 +14,7 @@ import com.insight.util.pojo.Log;
 import com.insight.util.pojo.LoginInfo;
 import com.insight.util.pojo.OperateType;
 import com.insight.util.pojo.Reply;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,7 +26,7 @@ import static com.insight.util.Generator.uuid;
  * @date 2019-09-01
  * @remark 角色管理服务
  */
-@org.springframework.stereotype.Service
+@Service
 public class RoleServiceImpl implements RoleService {
     private final RoleMapper mapper;
     private final Core core;
@@ -95,7 +95,7 @@ public class RoleServiceImpl implements RoleService {
         dto.setCreatorId(info.getUserId());
         dto.setCreatedTime(LocalDateTime.now());
 
-        mapper.addRole(dto);
+        core.addRole(dto);
         core.writeLog(info, OperateType.INSERT, "角色管理", id, dto);
 
         return ReplyHelper.created(id);
@@ -197,7 +197,7 @@ public class RoleServiceImpl implements RoleService {
             return ReplyHelper.fail("ID不存在,未更新数据");
         }
 
-        mapper.addMembers(id, members);
+        core.addMembers(id, members);
         core.writeLog(info, OperateType.INSERT, "角色管理", id, members);
 
         return ReplyHelper.success();
@@ -249,7 +249,6 @@ public class RoleServiceImpl implements RoleService {
      * @param permits 角色权限集合
      * @return Reply
      */
-    @Transactional
     @Override
     public Reply setFuncPermits(LoginInfo info, String id, List<FuncPermitDto> permits) {
         Role role = mapper.getRole(id);
@@ -257,8 +256,7 @@ public class RoleServiceImpl implements RoleService {
             return ReplyHelper.fail("ID不存在,未更新数据");
         }
 
-        mapper.removeFuncPermits(id);
-        mapper.addFuncPermits(id, permits);
+        core.setFuncPermits(id, permits);
         core.writeLog(info, OperateType.DELETE, "角色管理", id, permits);
 
         return ReplyHelper.success();

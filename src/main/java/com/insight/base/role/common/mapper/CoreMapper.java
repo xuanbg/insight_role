@@ -1,5 +1,8 @@
 package com.insight.base.role.common.mapper;
 
+import com.insight.base.role.common.dto.FuncPermitDto;
+import com.insight.base.role.common.dto.MemberDto;
+import com.insight.base.role.common.entity.Role;
 import com.insight.util.common.JsonTypeHandler;
 import com.insight.util.pojo.Log;
 import org.apache.ibatis.annotations.*;
@@ -13,6 +16,63 @@ import java.util.List;
  */
 @Mapper
 public interface CoreMapper {
+
+    /**
+     * 获取角色模板
+     *
+     * @param appId 应用ID
+     * @return 角色模板
+     */
+    @Select("select * from ibr_role where app_id = #{appId} and is_builtin = 1 and tenant_id is null;")
+    Role getTemplate(String appId);
+
+    /**
+     * 获取模板角色功能授权集合
+     *
+     * @param id 角色模板ID
+     * @return 角色功能授权集合
+     */
+    @Select("select function_id as id, permit from ibr_role_func_permit where role_id = #{id};")
+    List<FuncPermitDto> getFuncPermits(String id);
+
+    /**
+     * 新增角色
+     *
+     * @param role 角色DTO
+     */
+    @Insert("insert ibr_role(id, tenant_id, app_id, name, remark, is_builtin, creator, creator_id, created_time) values " +
+            "(#{id}, #{tenantId}, #{appId}, #{name}, #{remark}, #{isBuiltin}, #{creator}, #{creatorId}, #{createdTime});")
+    void addRole(Role role);
+
+    /**
+     * 添加角色成员
+     *
+     * @param id      角色ID
+     * @param members 角色成员集合
+     */
+    @Insert("<script>insert ibr_role_member (id, type, role_id, member_id) values " +
+            "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
+            "(replace(uuid(), '-', ''), #{item.type}, #{id}, #{item.id})</foreach>;</script>")
+    void addMembers(@Param("id") String id, @Param("list") List<MemberDto> members);
+
+    /**
+     * 添加角色功能授权
+     *
+     * @param id      角色ID
+     * @param permits 角色功能授权集合
+     */
+    @Insert("<script>insert ibr_role_func_permit (id, role_id, function_id, permit) values " +
+            "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
+            "(replace(uuid(), '-', ''), #{id}, #{item.id}, #{item.permit})</foreach>;</script>")
+    void addFuncPermits(@Param("id") String id, @Param("list") List<FuncPermitDto> permits);
+
+    /**
+     * 移除角色功能授权
+     *
+     * @param id 角色ID
+     */
+    @Delete("delete from ibr_role_func_permit where role_id = #{id};")
+    void removeFuncPermits(String id);
 
     /**
      * 记录操作日志

@@ -1,11 +1,17 @@
 package com.insight.base.role.common;
 
+import com.insight.base.role.common.dto.FuncPermitDto;
+import com.insight.base.role.common.dto.MemberDto;
+import com.insight.base.role.common.dto.RoleDto;
+import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.CoreMapper;
+import com.insight.util.Generator;
 import com.insight.util.pojo.Log;
 import com.insight.util.pojo.LoginInfo;
 import com.insight.util.pojo.OperateType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +34,67 @@ public class Core {
      */
     public Core(CoreMapper mapper) {
         this.mapper = mapper;
+    }
+
+    /**
+     * 从角色模板新增角色
+     *
+     * @param dto 角色DTO
+     */
+    @Transactional
+    public void addRoleFromTemplate(RoleDto dto) {
+        Role role = mapper.getTemplate(dto.getAppId());
+        String templateId = role.getId();
+
+        // 构造角色数据
+        String id = Generator.uuid();
+        role.setId(id);
+        role.setTenantId(dto.getTenantId());
+        role.setRemark(null);
+        role.setBuiltin(false);
+        role.setCreator(dto.getCreator());
+        role.setCreatorId(dto.getCreatorId());
+        role.setCreatedTime(LocalDateTime.now());
+        addRole(role);
+
+        // 写入角色成员
+        List<MemberDto> members = dto.getMembers();
+        addMembers(id, members);
+
+        // 读取模板权限并写入角色功能授权
+        List<FuncPermitDto> permits = mapper.getFuncPermits(templateId);
+        setFuncPermits(id, permits);
+    }
+
+    /**
+     * 新增角色
+     *
+     * @param role 角色DTO
+     */
+    public void addRole(Role role) {
+        mapper.addRole(role);
+    }
+
+    /**
+     * 新增角色成员
+     *
+     * @param id      角色ID
+     * @param members 角色成员集合
+     */
+    public void addMembers(String id, List<MemberDto> members) {
+        mapper.addMembers(id, members);
+    }
+
+    /**
+     * 添加角色功能授权
+     *
+     * @param id      角色ID
+     * @param permits 角色功能授权集合
+     */
+    @Transactional
+    public void setFuncPermits(String id, List<FuncPermitDto> permits) {
+        mapper.removeFuncPermits(id);
+        mapper.addFuncPermits(id, permits);
     }
 
     /**

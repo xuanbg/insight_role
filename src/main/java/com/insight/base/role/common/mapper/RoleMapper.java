@@ -38,15 +38,6 @@ public interface RoleMapper {
     Role getRole(String id);
 
     /**
-     * 新增角色
-     *
-     * @param role 角色DTO
-     */
-    @Insert("insert ibr_role(id, tenant_id, app_id, name, remark, is_builtin, creator, creator_id, created_time) values " +
-            "(#{id}, #{tenantId}, #{appId}, #{name}, #{remark}, #{isBuiltin}, #{creator}, #{creatorId}, #{createdTime});")
-    void addRole(Role role);
-
-    /**
      * 更新角色
      *
      * @param role 角色DTO
@@ -88,17 +79,6 @@ public interface RoleMapper {
     List<MemberUserDto> getMemberUsers(@Param("id") String id, @Param("key") String key);
 
     /**
-     * 添加角色成员
-     *
-     * @param id      角色ID
-     * @param members 角色成员集合
-     */
-    @Insert("<script>insert ibr_role_member (id, type, role_id, member_id) values " +
-            "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
-            "(replace(uuid(), '-', ''), #{item.type}, #{id}, #{item.id})</foreach>;</script>")
-    void addMembers(@Param("id") String id, @Param("list") List<MemberDto> members);
-
-    /**
      * 移除角色成员
      *
      * @param id     角色ID
@@ -127,25 +107,6 @@ public interface RoleMapper {
             "join ibs_navigator m on m.parent_id = n.id join ibs_function f on f.nav_id = m.id " +
             "left join ibr_role_func_permit p on p.role_id = r.id and p.function_id = f.id where r.id = #{id}) t order by i1, i2, i3, i4;")
     List<FuncPermitDto> getFuncPermits(String id);
-
-    /**
-     * 添加角色功能授权
-     *
-     * @param id      角色ID
-     * @param permits 角色功能授权集合
-     */
-    @Insert("<script>insert ibr_role_func_permit (id, role_id, function_id, permit) values " +
-            "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
-            "(replace(uuid(), '-', ''), #{id}, #{item.id}, #{item.permit})</foreach>;</script>")
-    void addFuncPermits(@Param("id") String id, @Param("list") List<FuncPermitDto> permits);
-
-    /**
-     * 移除角色功能授权
-     *
-     * @param id 角色ID
-     */
-    @Delete("delete from ibr_role_func_permit where role_id = #{id};")
-    void removeFuncPermits(String id);
 
     /**
      * 获取角色数据权限列表

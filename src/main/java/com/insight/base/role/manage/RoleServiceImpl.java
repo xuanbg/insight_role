@@ -82,9 +82,8 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Reply newRole(LoginInfo info, Role dto) {
         String id = uuid();
-        String tenantId = info.getTenantId();
         dto.setId(id);
-        dto.setTenantId(tenantId);
+        dto.setTenantId(info.getTenantId());
         dto.setAppId(info.getAppId());
         dto.setBuiltin(false);
         dto.setCreator(info.getUserName());

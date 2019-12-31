@@ -24,7 +24,7 @@ public class Listener {
     }
 
     /**
-     * 从队列订阅新增用户消息
+     * 从队列订阅新增角色消息
      *
      * @param dto 队列消息
      */

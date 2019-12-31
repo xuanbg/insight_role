@@ -120,6 +120,7 @@ public class Core {
     public void writeLog(LoginInfo info, OperateType type, String business, String id, Object content) {
         Log log = new Log();
         log.setId(uuid());
+        log.setTenantId(info.getTenantId());
         log.setType(type);
         log.setBusiness(business);
         log.setBusinessId(id);

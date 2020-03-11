@@ -1,6 +1,10 @@
 package com.insight.base.role.common;
 
 import com.insight.util.pojo.RoleDto;
+import com.rabbitmq.client.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class Listener {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final Core core;
 
     /**
@@ -30,7 +35,12 @@ public class Listener {
      */
     @RabbitHandler
     @RabbitListener(queues = "insight.role")
-    public void receiveRole(RoleDto dto) {
-        core.addRoleFromTemplate(dto);
+    public void receiveRole(RoleDto dto, Channel channel, Message message) {
+        try {
+            core.addRoleFromTemplate(dto);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (Exception ex) {
+            logger.error("发生异常: {}", ex.getMessage());
+        }
     }
 }

@@ -69,13 +69,13 @@ public interface RoleMapper {
      */
     @Select("select t.id, t.parent_id, t.type, t.index, t.name, t.permit from (" +
             "select a.id, null as parent_id, 0 as type, a.index, a.name, null as permit, a.index as i1, null as i2, null as i3, null as i4 " +
-            "from ibr_role r join ibs_application a on a.id = r.app_id where r.id = #{id} union all " +
+            "from ibr_role r join ibs_application a on a.id = r.app_id where r.id = #{id} union " +
             "select n.id, n.app_id as parent_id, n.type, n.index, n.name, null as permit, a.index as i1, n.index as i2, null as i3, null as i4 " +
             "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
-            "where r.id = #{id} union all " +
+            "where r.id = #{id} union " +
             "select m.id, m.parent_id, m.type, m.index, m.name, null as permit, a.index as i1, n.index as i2, m.index as i3, null as i4 " +
             "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
-            "join ibs_navigator m on m.parent_id = n.id where r.id = #{id} union all " +
+            "join ibs_navigator m on m.parent_id = n.id where r.id = #{id} union " +
             "select f.id, f.nav_id as parent_id, ifnull(p.permit, 2) + 3 as type, f.index, f.name, p.permit, a.index as i1, n.index as i2, m.index as i3, f.index as i4 " +
             "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
             "join ibs_navigator m on m.parent_id = n.id join ibs_function f on f.nav_id = m.id " +
@@ -97,7 +97,7 @@ public interface RoleMapper {
      * @param roleId   角色ID
      * @return 用户成员集合
      */
-    @Select("<script>select u.id, 1 as type, u.`name`, u.remark from ibu_user u " +
+    @Select("<script>select u.id, '1' as parent_id, 1 as type, u.`name`, u.remark from ibu_user u " +
             "<if test = 'tenantId != null'>join ibt_tenant_user r on r.user_id = u.id and r.tenant_id = #{tenantId} </if>" +
             "left join ibr_role_member m on m.member_id = u.id and m.type = 1 and m.role_id = #{roleId} " +
             "where u.is_invalid = 0 and m.id is null order by u.created_time</script>")
@@ -110,7 +110,7 @@ public interface RoleMapper {
      * @param roleId   角色ID
      * @return 用户组成员集合
      */
-    @Select("select g.id, 2 as type, g.`name`, g.remark from ibu_group g " +
+    @Select("select g.id, '2' as parent_id, 2 as type, g.`name`, g.remark from ibu_group g " +
             "left join ibr_role_member m on m.member_id = g.id and m.type = 2 and m.role_id = #{roleId} " +
             "where g.tenant_id = #{tenantId} and m.id is null order by g.created_time;")
     List<RoleMemberDto> getMemberOfGroup(@Param("tenantId") String tenantId, @Param("roleId") String roleId);

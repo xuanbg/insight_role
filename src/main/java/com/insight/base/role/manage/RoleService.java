@@ -35,6 +35,67 @@ public interface RoleService {
     Reply getRole(String id);
 
     /**
+     * 获取角色成员
+     *
+     * @param id 角色ID
+     * @return Reply
+     */
+    Reply getMembers(String id);
+
+    /**
+     * 查询角色成员用户
+     *
+     * @param id      角色ID
+     * @param keyword 查询关键词
+     * @param page    分页页码
+     * @param size    每页记录数
+     * @return Reply
+     */
+    Reply getMemberUsers(String id, String keyword, int page, int size);
+
+    /**
+     * 获取角色权限
+     *
+     * @param id 角色ID
+     * @return Reply
+     */
+    Reply getFuncPermits(String id);
+
+    /**
+     * 获取角色可选应用列表
+     *
+     * @return Reply
+     */
+    Reply getApps();
+
+    /**
+     * 获取角色可选用户成员
+     *
+     * @param tenantId 租户ID
+     * @param id       角色ID
+     * @return Reply
+     */
+    Reply getMemberOfUser(String tenantId, String id);
+
+    /**
+     * 获取角色可选用户组成员
+     *
+     * @param tenantId 租户ID
+     * @param id       角色ID
+     * @return Reply
+     */
+    Reply getMemberOfGroup(String tenantId, String id);
+
+    /**
+     * 获取角色可选职位成员
+     *
+     * @param tenantId 租户ID
+     * @param id       角色ID
+     * @return Reply
+     */
+    Reply getMemberOfTitle(String tenantId, String id);
+
+    /**
      * 新增角色
      *
      * @param info 用户关键信息
@@ -62,25 +123,6 @@ public interface RoleService {
     Reply deleteRole(LoginInfo info, String id);
 
     /**
-     * 获取角色成员
-     *
-     * @param id 角色ID
-     * @return Reply
-     */
-    Reply getMembers(String id);
-
-    /**
-     * 查询角色成员用户
-     *
-     * @param id      角色ID
-     * @param keyword 查询关键词
-     * @param page    分页页码
-     * @param size    每页记录数
-     * @return Reply
-     */
-    Reply getMemberUsers(String id, String keyword, int page, int size);
-
-    /**
      * 添加角色成员
      *
      * @param info    用户关键信息
@@ -101,22 +143,14 @@ public interface RoleService {
     Reply removeMember(LoginInfo info, String id, MemberDto member);
 
     /**
-     * 获取角色权限
-     *
-     * @param id 角色ID
-     * @return Reply
-     */
-    Reply getFuncPermits(String id);
-
-    /**
      * 设置角色权限
      *
-     * @param info    用户关键信息
-     * @param id      角色ID
-     * @param permits 角色权限集合
+     * @param info   用户关键信息
+     * @param id     角色ID
+     * @param permit 角色权限
      * @return Reply
      */
-    Reply setFuncPermits(LoginInfo info, String id, List<FuncPermitDto> permits);
+    Reply setFuncPermit(LoginInfo info, String id, FuncPermitDto permit);
 
     /**
      * 获取日志列表

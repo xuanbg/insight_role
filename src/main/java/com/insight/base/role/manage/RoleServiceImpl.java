@@ -3,9 +3,7 @@ package com.insight.base.role.manage;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.insight.base.role.common.Core;
-import com.insight.base.role.common.dto.FuncPermitDto;
-import com.insight.base.role.common.dto.MemberUserDto;
-import com.insight.base.role.common.dto.RoleListDto;
+import com.insight.base.role.common.dto.*;
 import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.RoleMapper;
 import com.insight.util.ReplyHelper;
@@ -73,6 +71,129 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
+     * 获取角色成员
+     *
+     * @param id 角色ID
+     * @return Reply
+     */
+    @Override
+    public Reply getMembers(String id) {
+        Role role = mapper.getRole(id);
+        if (role == null) {
+            return ReplyHelper.fail("ID不存在,未读取数据");
+        }
+
+        List<MemberDto> members = mapper.getMembers(id);
+        return ReplyHelper.success(members);
+    }
+
+    /**
+     * 查询角色成员用户
+     *
+     * @param id      角色ID
+     * @param keyword 查询关键词
+     * @param page    分页页码
+     * @param size    每页记录数
+     * @return Reply
+     */
+    @Override
+    public Reply getMemberUsers(String id, String keyword, int page, int size) {
+        Role role = mapper.getRole(id);
+        if (role == null) {
+            return ReplyHelper.fail("ID不存在,未读取数据");
+        }
+
+        PageHelper.startPage(page, size);
+        List<MemberUserDto> users = mapper.getMemberUsers(id, keyword);
+        PageInfo<MemberUserDto> pageInfo = new PageInfo<>(users);
+
+        return ReplyHelper.success(users, pageInfo.getTotal());
+    }
+
+    /**
+     * 获取角色权限
+     *
+     * @param id 角色ID
+     * @return Reply
+     */
+    @Override
+    public Reply getFuncPermits(String id) {
+        Role role = mapper.getRole(id);
+        if (role == null) {
+            return ReplyHelper.fail("ID不存在,未读取数据");
+        }
+
+        List<FuncPermitDto> permits = mapper.getFuncPermits(id);
+        return ReplyHelper.success(permits);
+    }
+
+    /**
+     * 获取角色可选应用列表
+     *
+     * @return Reply
+     */
+    @Override
+    public Reply getApps() {
+        List<AppListDto> apps = mapper.getApps();
+
+        return ReplyHelper.success(apps);
+    }
+
+    /**
+     * 获取角色可选用户成员
+     *
+     * @param tenantId 租户ID
+     * @param id       角色ID
+     * @return Reply
+     */
+    @Override
+    public Reply getMemberOfUser(String tenantId, String id) {
+        Role role = mapper.getRole(id);
+        if (role == null) {
+            return ReplyHelper.fail("ID不存在,未读取数据");
+        }
+
+        List<RoleMemberDto> members = mapper.getMemberOfUser(tenantId, id);
+        return ReplyHelper.success(members);
+    }
+
+    /**
+     * 获取角色可选用户组成员
+     *
+     * @param tenantId 租户ID
+     * @param id       角色ID
+     * @return Reply
+     */
+    @Override
+    public Reply getMemberOfGroup(String tenantId, String id) {
+        Role role = mapper.getRole(id);
+        if (role == null) {
+            return ReplyHelper.fail("ID不存在,未读取数据");
+        }
+
+        List<RoleMemberDto> members = mapper.getMemberOfGroup(tenantId, id);
+        return ReplyHelper.success(members);
+    }
+
+    /**
+     * 获取角色可选职位成员
+     *
+     * @param tenantId 租户ID
+     * @param id       角色ID
+     * @return Reply
+     */
+    @Override
+    public Reply getMemberOfTitle(String tenantId, String id) {
+        Role role = mapper.getRole(id);
+        if (role == null) {
+            return ReplyHelper.fail("ID不存在,未读取数据");
+        }
+
+        List<RoleMemberDto> members = mapper.getMemberOfTitle(tenantId, id);
+        return ReplyHelper.success(members);
+    }
+
+    /**
      * 新增角色
      *
      * @param info 用户关键信息
@@ -84,8 +205,6 @@ public class RoleServiceImpl implements RoleService {
         String id = uuid();
         dto.setId(id);
         dto.setTenantId(info.getTenantId());
-        dto.setAppId(info.getAppId());
-        dto.setBuiltin(false);
         dto.setCreator(info.getUserName());
         dto.setCreatorId(info.getUserId());
         dto.setCreatedTime(LocalDateTime.now());
@@ -138,46 +257,6 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * 获取角色成员
-     *
-     * @param id 角色ID
-     * @return Reply
-     */
-    @Override
-    public Reply getMembers(String id) {
-        Role role = mapper.getRole(id);
-        if (role == null) {
-            return ReplyHelper.fail("ID不存在,未读取数据");
-        }
-
-        List<MemberDto> members = mapper.getMembers(id);
-        return ReplyHelper.success(members);
-    }
-
-    /**
-     * 查询角色成员用户
-     *
-     * @param id      角色ID
-     * @param keyword 查询关键词
-     * @param page    分页页码
-     * @param size    每页记录数
-     * @return Reply
-     */
-    @Override
-    public Reply getMemberUsers(String id, String keyword, int page, int size) {
-        Role role = mapper.getRole(id);
-        if (role == null) {
-            return ReplyHelper.fail("ID不存在,未读取数据");
-        }
-
-        PageHelper.startPage(page, size);
-        List<MemberUserDto> users = mapper.getMemberUsers(id, keyword);
-        PageInfo<MemberUserDto> pageInfo = new PageInfo<>(users);
-
-        return ReplyHelper.success(users, pageInfo.getTotal());
-    }
-
-    /**
      * 添加角色成员
      *
      * @param info    用户关键信息
@@ -220,39 +299,22 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * 获取角色权限
-     *
-     * @param id 角色ID
-     * @return Reply
-     */
-    @Override
-    public Reply getFuncPermits(String id) {
-        Role role = mapper.getRole(id);
-        if (role == null) {
-            return ReplyHelper.fail("ID不存在,未读取数据");
-        }
-
-        List<FuncPermitDto> permits = mapper.getFuncPermits(id);
-        return ReplyHelper.success(permits);
-    }
-
-    /**
      * 设置角色权限
      *
-     * @param info    用户关键信息
-     * @param id      角色ID
-     * @param permits 角色权限集合
+     * @param info   用户关键信息
+     * @param id     角色ID
+     * @param permit 角色权限
      * @return Reply
      */
     @Override
-    public Reply setFuncPermits(LoginInfo info, String id, List<FuncPermitDto> permits) {
+    public Reply setFuncPermit(LoginInfo info, String id, FuncPermitDto permit) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未更新数据");
         }
 
-        core.setFuncPermits(id, permits);
-        core.writeLog(info, OperateType.DELETE, "角色管理", id, permits);
+        core.setFuncPermit(id, permit);
+        core.writeLog(info, OperateType.DELETE, "角色管理", id, permit);
 
         return ReplyHelper.success();
     }

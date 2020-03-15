@@ -23,7 +23,7 @@ public interface CoreMapper {
      * @param appId 应用ID
      * @return 角色模板
      */
-    @Select("select * from ibr_role where app_id = #{appId} and tenant_id is null;")
+    @Select("select * from ibr_role where app_id = #{appId} and tenant_id is null and is_builtin = 0;")
     List<Role> getTemplates(String appId);
 
     /**
@@ -57,6 +57,45 @@ public interface CoreMapper {
     addMembers(@Param("id") String id, @Param("list") List<MemberDto> members);
 
     /**
+     * 获取指定角色ID和功能ID的功能授权信息
+     *
+     * @param id     角色ID
+     * @param funcId 功能ID
+     * @return 功能授权信息
+     */
+    @Select("select * from ibr_role_func_permit where role_id = #{id} and function_id = #{funcId};")
+    FuncPermitDto getFuncPermit(@Param("id") String id, @Param("funcId") String funcId);
+
+    /**
+     * 添加角色功能授权
+     *
+     * @param id     角色ID
+     * @param funcId 功能ID
+     * @param permit 授权状态
+     */
+    @Insert("insert ibr_role_func_permit (id, role_id, function_id, permit) values (replace(uuid(), '-', ''), #{id}, #{funcId}, #{permit});")
+    void addFuncPermit(@Param("id") String id, @Param("funcId") String funcId, @Param("permit") Boolean permit);
+
+    /**
+     * 更新角色功能授权
+     *
+     * @param id     角色ID
+     * @param funcId 功能ID
+     * @param permit 授权状态
+     */
+    @Update("update ibr_role_func_permit set permit = #{permit} where role_id = #{id} and function_id = #{funcId};")
+    void setFuncPermit(@Param("id") String id, @Param("funcId") String funcId, @Param("permit") Boolean permit);
+
+    /**
+     * 移除角色功能授权
+     *
+     * @param id     角色ID
+     * @param funcId 功能ID
+     */
+    @Delete("delete from ibr_role_func_permit where role_id = #{id} and function_id = #{funcId};")
+    void removeFuncPermit(@Param("id") String id, @Param("funcId") String funcId);
+
+    /**
      * 添加角色功能授权
      *
      * @param id      角色ID
@@ -66,14 +105,6 @@ public interface CoreMapper {
             "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
             "(replace(uuid(), '-', ''), #{id}, #{item.id}, #{item.permit})</foreach>;</script>")
     void addFuncPermits(@Param("id") String id, @Param("list") List<FuncPermitDto> permits);
-
-    /**
-     * 移除角色功能授权
-     *
-     * @param id 角色ID
-     */
-    @Delete("delete from ibr_role_func_permit where role_id = #{id};")
-    void removeFuncPermits(String id);
 
     /**
      * 记录操作日志

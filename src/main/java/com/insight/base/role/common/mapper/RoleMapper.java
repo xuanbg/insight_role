@@ -1,9 +1,6 @@
 package com.insight.base.role.common.mapper;
 
-import com.insight.base.role.common.dto.DataPermitDto;
-import com.insight.base.role.common.dto.FuncPermitDto;
-import com.insight.base.role.common.dto.MemberUserDto;
-import com.insight.base.role.common.dto.RoleListDto;
+import com.insight.base.role.common.dto.*;
 import com.insight.base.role.common.entity.Role;
 import com.insight.util.pojo.MemberDto;
 import org.apache.ibatis.annotations.*;
@@ -42,6 +39,95 @@ public interface RoleMapper {
     Role getRole(String id);
 
     /**
+     * 获取角色成员
+     *
+     * @param id 角色ID
+     * @return 角色成员集合
+     */
+    @Select("select u.id, '1' as parent_id, m.type, u.name from ibr_role_member m join ibu_user u on u.id = m.member_id where m.role_id = #{id} union all " +
+            "select g.id, '2' as parent_id, m.type, g.name from ibr_role_member m join ibu_group g on g.id = m.member_id where m.role_id = #{id} union all " +
+            "select o.id, '3' as parent_id, m.type, o.full_name as name from ibr_role_member m join ibo_organize o on o.id = m.member_id where m.role_id = #{id};")
+    List<MemberDto> getMembers(String id);
+
+    /**
+     * 查询角色成员用户
+     *
+     * @param id  角色ID
+     * @param key 查询关键词
+     * @return 角色成员用户集合
+     */
+    @Select("<script>select u.id, u.code, u.name, u.account, u.mobile, u.is_invalid from ibv_user_roles m join ibu_user u on u.id = m.user_id " +
+            "<if test = 'key != null'>and (u.code = #{key} or u.account = #{key} or u.name like concat('%',#{key},'%')) </if>" +
+            "where m.role_id = #{id} order by u.created_time</script>")
+    List<MemberUserDto> getMemberUsers(@Param("id") String id, @Param("key") String key);
+
+    /**
+     * 获取角色功能权限列表
+     *
+     * @param id 角色ID
+     * @return 功能权限列表
+     */
+    @Select("select t.id, t.parent_id, t.type, t.index, t.name, t.permit from (" +
+            "select a.id, null as parent_id, 0 as type, a.index, a.name, null as permit, a.index as i1, null as i2, null as i3, null as i4 " +
+            "from ibr_role r join ibs_application a on a.id = r.app_id where r.id = #{id} union all " +
+            "select n.id, n.app_id as parent_id, n.type, n.index, n.name, null as permit, a.index as i1, n.index as i2, null as i3, null as i4 " +
+            "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
+            "where r.id = #{id} union all " +
+            "select m.id, m.parent_id, m.type, m.index, m.name, null as permit, a.index as i1, n.index as i2, m.index as i3, null as i4 " +
+            "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
+            "join ibs_navigator m on m.parent_id = n.id where r.id = #{id} union all " +
+            "select f.id, f.nav_id as parent_id, ifnull(p.permit, 2) + 3 as type, f.index, f.name, p.permit, a.index as i1, n.index as i2, m.index as i3, f.index as i4 " +
+            "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
+            "join ibs_navigator m on m.parent_id = n.id join ibs_function f on f.nav_id = m.id " +
+            "left join ibr_role_func_permit p on p.role_id = r.id and p.function_id = f.id where r.id = #{id}) t order by i1, i2, i3, i4;")
+    List<FuncPermitDto> getFuncPermits(String id);
+
+    /**
+     * 获取角色可选应用列表
+     *
+     * @return 应用列表
+     */
+    @Select("select id, `name`, alias from ibs_application where is_auto_tenant is not null order by `index`;")
+    List<AppListDto> getApps();
+
+    /**
+     * 获取角色可选用户成员
+     *
+     * @param tenantId 租户ID
+     * @param roleId   角色ID
+     * @return 用户成员集合
+     */
+    @Select("<script>select u.id, 1 as type, u.`name`, u.remark from ibu_user u " +
+            "<if test = 'tenantId != null'>join ibt_tenant_user r on r.user_id = u.id and r.tenant_id = #{tenantId} </if>" +
+            "left join ibr_role_member m on m.member_id = u.id and m.type = 1 and m.role_id = #{roleId} " +
+            "where u.is_invalid = 0 and m.id is null order by u.created_time</script>")
+    List<RoleMemberDto> getMemberOfUser(@Param("tenantId") String tenantId, @Param("roleId") String roleId);
+
+    /**
+     * 获取角色可选用户组成员
+     *
+     * @param tenantId 租户ID
+     * @param roleId   角色ID
+     * @return 用户组成员集合
+     */
+    @Select("select g.id, 2 as type, g.`name`, g.remark from ibu_group g " +
+            "left join ibr_role_member m on m.member_id = g.id and m.type = 2 and m.role_id = #{roleId} " +
+            "where g.tenant_id = #{tenantId} and m.id is null order by g.created_time;")
+    List<RoleMemberDto> getMemberOfGroup(@Param("tenantId") String tenantId, @Param("roleId") String roleId);
+
+    /**
+     * 获取角色可选职位成员
+     *
+     * @param tenantId 租户ID
+     * @param roleId   角色ID
+     * @return 职位成员集合
+     */
+    @Select("select o.id, o.parent_id, o.type, o.`index`, o.`name`, o.remark from ibo_organize o " +
+            "left join ibr_role_member m on m.member_id = o.id and m.type = 3 and m.role_id = #{roleId} " +
+            "where o.tenant_id = #{tenantId} and m.id is null order by o.`index`;")
+    List<RoleMemberDto> getMemberOfTitle(@Param("tenantId") String tenantId, @Param("roleId") String roleId);
+
+    /**
      * 更新角色
      *
      * @param role 角色DTO
@@ -60,29 +146,6 @@ public interface RoleMapper {
     void deleteRole(String id);
 
     /**
-     * 获取角色成员
-     *
-     * @param id 角色ID
-     * @return 角色成员集合
-     */
-    @Select("select u.id, m.type, u.name from ibr_role_member m join ibu_user u on u.id = m.member_id where m.role_id = #{id} union all " +
-            "select g.id, m.type, g.name from ibr_role_member m join ibu_group g on g.id = m.member_id where m.role_id = #{id} union all " +
-            "select o.id, m.type, o.full_name as name from ibr_role_member m join ibo_organize o on o.id = m.member_id where m.role_id = #{id};")
-    List<MemberDto> getMembers(String id);
-
-    /**
-     * 查询角色成员用户
-     *
-     * @param id  角色ID
-     * @param key 查询关键词
-     * @return 角色成员用户集合
-     */
-    @Select("<script>select u.id, u.code, u.name, u.account, u.mobile, u.is_invalid from ibv_user_roles m join ibu_user u on u.id = m.user_id " +
-            "<if test = 'key != null'>and (u.code = #{key} or u.account = #{key} or u.name like concat('%',#{key},'%')) </if>" +
-            "where m.role_id = #{id} order by u.created_time</script>")
-    List<MemberUserDto> getMemberUsers(@Param("id") String id, @Param("key") String key);
-
-    /**
      * 移除角色成员
      *
      * @param id     角色ID
@@ -90,36 +153,6 @@ public interface RoleMapper {
      */
     @Delete("delete from ibr_role_member where type = #{member.type} and role_id = #{id} and member_id = #{member.id};")
     void removeMember(@Param("id") String id, @Param("member") MemberDto member);
-
-    /**
-     * 获取角色功能权限列表
-     *
-     * @param id 角色ID
-     * @return 功能权限列表
-     */
-    @Select("select t.id, t.parent_id, t.index, t.name, t.permit from (" +
-            "select a.id, null as parent_id, a.index, a.name, null as permit, a.index as i1, null as i2, null as i3, null as i4 " +
-            "from ibr_role r join ibs_application a on a.id = r.app_id where r.id = #{id} union all " +
-            "select n.id, n.app_id as parent_id, n.index, n.name, null as permit, a.index as i1, n.index as i2, null as i3, null as i4 " +
-            "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
-            "where r.id = #{id} union all " +
-            "select m.id, m.parent_id, m.index, m.name, null as permit, a.index as i1, n.index as i2, m.index as i3, null as i4 " +
-            "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
-            "join ibs_navigator m on m.parent_id = n.id where r.id = #{id} union all " +
-            "select f.id, f.nav_id as parent_id, f.index, f.name, p.permit, a.index as i1, n.index as i2, m.index as i3, f.index as i4 " +
-            "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
-            "join ibs_navigator m on m.parent_id = n.id join ibs_function f on f.nav_id = m.id " +
-            "left join ibr_role_func_permit p on p.role_id = r.id and p.function_id = f.id where r.id = #{id}) t order by i1, i2, i3, i4;")
-    List<FuncPermitDto> getFuncPermits(String id);
-
-    /**
-     * 获取角色数据权限列表
-     *
-     * @param id 角色ID
-     * @return 数据权限列表
-     */
-    @Select("")
-    List<DataPermitDto> getDataPermits(String id);
 
     /**
      * 添加角色数据授权

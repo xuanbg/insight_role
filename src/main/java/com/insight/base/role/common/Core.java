@@ -65,7 +65,7 @@ public class Core {
 
             // 读取模板权限并写入角色功能授权
             List<FuncPermitDto> permits = mapper.getFuncPermits(templateId);
-            setFuncPermits(id, permits);
+            mapper.addFuncPermits(id, permits);
 
             // 写入角色成员
             if (members == null || members.isEmpty()) {
@@ -98,13 +98,22 @@ public class Core {
     /**
      * 添加角色功能授权
      *
-     * @param id      角色ID
-     * @param permits 角色功能授权集合
+     * @param id     角色ID
+     * @param permit 角色功能授权DTO
      */
     @Transactional
-    public void setFuncPermits(String id, List<FuncPermitDto> permits) {
-        mapper.removeFuncPermits(id);
-        mapper.addFuncPermits(id, permits);
+    public void setFuncPermit(String id, FuncPermitDto permit) {
+        if (permit.getPermit() == null) {
+            mapper.removeFuncPermit(id, permit.getId());
+            return;
+        }
+
+        FuncPermitDto data = mapper.getFuncPermit(id, permit.getId());
+        if (data == null){
+            mapper.addFuncPermit(id, permit.getId(), permit.getPermit());
+        }else {
+            mapper.setFuncPermit(id, permit.getId(), permit.getPermit());
+        }
     }
 
     /**

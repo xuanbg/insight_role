@@ -65,6 +65,92 @@ public class RoleController {
     }
 
     /**
+     * 获取角色成员
+     *
+     * @param id 角色ID
+     * @return Reply
+     */
+    @GetMapping("/v1.0/roles/{id}/members")
+    public Reply getMembers(@PathVariable String id) {
+        return service.getMembers(id);
+    }
+
+    /**
+     * 查询角色成员用户
+     *
+     * @param id      角色ID
+     * @param keyword 查询关键词
+     * @param page    分页页码
+     * @param size    每页记录数
+     * @return Reply
+     */
+    @GetMapping("/v1.0/roles/{id}/users")
+    public Reply getMemberUsers(@PathVariable String id, @RequestParam(required = false) String keyword,
+                                @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
+        return service.getMemberUsers(id, keyword, page, size);
+    }
+
+    /**
+     * 获取角色权限
+     *
+     * @param id 角色ID
+     * @return Reply
+     */
+    @GetMapping("/v1.0/roles/{id}/funcs")
+    public Reply getFuncPermits(@PathVariable String id) {
+        return service.getFuncPermits(id);
+    }
+
+    /**
+     * 获取角色可选应用列表
+     *
+     * @return Reply
+     */
+    @GetMapping("/v1.0/apps")
+    public Reply getApps() {
+        return service.getApps();
+    }
+
+    /**
+     * 获取角色可选用户成员
+     *
+     * @param id 角色ID
+     * @return Reply
+     */
+    @GetMapping("/v1.0/roles/{id}/users/other")
+    public Reply getMemberOfUser(@RequestHeader("loginInfo") String info, @PathVariable String id) {
+        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+
+        return service.getMemberOfUser(loginInfo.getTenantId(), id);
+    }
+
+    /**
+     * 获取角色可选用户组成员
+     *
+     * @param id 角色ID
+     * @return Reply
+     */
+    @GetMapping("/v1.0/roles/{id}/groups/other")
+    public Reply getMemberOfGroup(@RequestHeader("loginInfo") String info, @PathVariable String id) {
+        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+
+        return service.getMemberOfGroup(loginInfo.getTenantId(), id);
+    }
+
+    /**
+     * 获取角色可选职位成员
+     *
+     * @param id 角色ID
+     * @return Reply
+     */
+    @GetMapping("/v1.0/roles/{id}/orgs/other")
+    public Reply getMemberOfTitle(@RequestHeader("loginInfo") String info, @PathVariable String id) {
+        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+
+        return service.getMemberOfTitle(loginInfo.getTenantId(), id);
+    }
+
+    /**
      * 新增角色
      *
      * @param info 用户关键信息
@@ -107,32 +193,6 @@ public class RoleController {
     }
 
     /**
-     * 获取角色成员
-     *
-     * @param id 角色ID
-     * @return Reply
-     */
-    @GetMapping("/v1.0/roles/{id}/members")
-    public Reply getMembers(@PathVariable String id) {
-        return service.getMembers(id);
-    }
-
-    /**
-     * 查询角色成员用户
-     *
-     * @param id      角色ID
-     * @param keyword 查询关键词
-     * @param page    分页页码
-     * @param size    每页记录数
-     * @return Reply
-     */
-    @GetMapping("/v1.0/roles/{id}/users")
-    public Reply getMemberUsers(@PathVariable String id, @RequestParam(required = false) String keyword,
-                                @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
-        return service.getMemberUsers(id, keyword, page, size);
-    }
-
-    /**
      * 添加角色成员
      *
      * @param info    用户关键信息
@@ -169,32 +229,21 @@ public class RoleController {
     }
 
     /**
-     * 获取角色权限
-     *
-     * @param id 角色ID
-     * @return Reply
-     */
-    @GetMapping("/v1.0/roles/{id}/funcs")
-    public Reply getFuncPermits(@PathVariable String id) {
-        return service.getFuncPermits(id);
-    }
-
-    /**
      * 设置角色权限
      *
-     * @param info    用户关键信息
-     * @param id      角色ID
-     * @param permits 角色权限集合
+     * @param info   用户关键信息
+     * @param id     角色ID
+     * @param permit 角色权限
      * @return Reply
      */
     @PutMapping("/v1.0/roles/{id}/funcs")
-    public Reply setFuncPermits(@RequestHeader("loginInfo") String info, @PathVariable String id, @RequestBody List<FuncPermitDto> permits) {
-        if (permits == null || permits.isEmpty()) {
+    public Reply setFuncPermits(@RequestHeader("loginInfo") String info, @PathVariable String id, @RequestBody FuncPermitDto permit) {
+        if (permit == null) {
             return ReplyHelper.invalidParam("请选择需要授与的功能权限");
         }
 
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
-        return service.setFuncPermits(loginInfo, id, permits);
+        return service.setFuncPermit(loginInfo, id, permit);
     }
 
     /**

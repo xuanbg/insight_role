@@ -6,19 +6,19 @@ import java.io.Serializable;
 
 /**
  * @author 宣炳刚
- * @date 2019/12/6
+ * @date 2020/3/15
  * @remark 角色成员DTO
  */
-public class FuncPermitDto implements Serializable {
+public class RoleMemberDto implements Serializable {
     private static final long serialVersionUID = -1L;
 
     /**
-     * 资源ID
+     * 成员唯一ID
      */
     private String id;
 
     /**
-     * 资源父ID
+     * 父ID
      */
     private String parentId;
 
@@ -33,14 +33,14 @@ public class FuncPermitDto implements Serializable {
     private Integer index;
 
     /**
-     * 资源名称
+     * 成员名称
      */
     private String name;
 
     /**
-     * 授权类型:0.拒绝;1.允许
+     * 备注
      */
-    private Boolean permit;
+    private String remark;
 
     public String getId() {
         return id;
@@ -82,12 +82,12 @@ public class FuncPermitDto implements Serializable {
         this.name = name;
     }
 
-    public Boolean getPermit() {
-        return permit;
+    public String getRemark() {
+        return remark;
     }
 
-    public void setPermit(Boolean permit) {
-        this.permit = permit;
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     @Override

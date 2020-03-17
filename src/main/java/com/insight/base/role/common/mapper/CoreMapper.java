@@ -23,7 +23,7 @@ public interface CoreMapper {
      * @param appId 应用ID
      * @return 角色模板
      */
-    @Select("select * from ibr_role where app_id = #{appId} and tenant_id is null and is_builtin = 0;")
+    @Select("select * from ibr_role where app_id = #{appId} and tenant_id is null and is_builtin = 1;")
     List<Role> getTemplates(String appId);
 
     /**

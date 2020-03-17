@@ -271,6 +271,10 @@ public class RoleServiceImpl implements RoleService {
             return ReplyHelper.fail("ID不存在,未更新数据");
         }
 
+        if (role.getTenantId() == null && role.getBuiltin()){
+            return ReplyHelper.fail("角色模板不能添加角色成员");
+        }
+
         core.addMembers(id, members);
         core.writeLog(info, OperateType.INSERT, "角色管理", id, members);
 

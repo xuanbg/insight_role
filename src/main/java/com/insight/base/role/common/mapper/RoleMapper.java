@@ -85,10 +85,13 @@ public interface RoleMapper {
     /**
      * 获取角色可选应用列表
      *
+     * @param tenantId 租户ID
      * @return 应用列表
      */
-    @Select("select id, `name`, alias from ibs_application where is_auto_tenant is not null order by `index`;")
-    List<AppListDto> getApps();
+    @Select("<script>select a.id, a.`name`, a.alias from ibs_application a " +
+            "<if test = 'tenantId != null'>join ibt_tenant_app r on r.app_id = a.id and r.tenant_id = #{tenantId} </if>" +
+            "where a.is_auto_tenant is not null order by a.`index`</script>")
+    List<AppListDto> getApps(String tenantId);
 
     /**
      * 获取角色可选用户成员

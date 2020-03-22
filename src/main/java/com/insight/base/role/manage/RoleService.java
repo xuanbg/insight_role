@@ -64,9 +64,10 @@ public interface RoleService {
     /**
      * 获取角色可选应用列表
      *
+     * @param tenantId 租户ID
      * @return Reply
      */
-    Reply getApps();
+    Reply getApps(String tenantId);
 
     /**
      * 获取角色可选用户成员

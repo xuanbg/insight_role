@@ -104,17 +104,21 @@ public class RoleController {
     /**
      * 获取角色可选应用列表
      *
+     * @param info 用户关键信息
      * @return Reply
      */
     @GetMapping("/v1.0/apps")
-    public Reply getApps() {
-        return service.getApps();
+    public Reply getApps(@RequestHeader("loginInfo") String info) {
+        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+
+        return service.getApps(loginInfo.getTenantId());
     }
 
     /**
      * 获取角色可选用户成员
      *
-     * @param id 角色ID
+     * @param info 用户关键信息
+     * @param id   角色ID
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/users/other")
@@ -127,7 +131,8 @@ public class RoleController {
     /**
      * 获取角色可选用户组成员
      *
-     * @param id 角色ID
+     * @param info 用户关键信息
+     * @param id   角色ID
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/groups/other")
@@ -140,7 +145,8 @@ public class RoleController {
     /**
      * 获取角色可选职位成员
      *
-     * @param id 角色ID
+     * @param info 用户关键信息
+     * @param id   角色ID
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/orgs/other")

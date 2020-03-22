@@ -130,11 +130,12 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 获取角色可选应用列表
      *
+     * @param tenantId 租户ID
      * @return Reply
      */
     @Override
-    public Reply getApps() {
-        List<AppListDto> apps = mapper.getApps();
+    public Reply getApps(String tenantId) {
+        List<AppListDto> apps = mapper.getApps(tenantId);
 
         return ReplyHelper.success(apps);
     }
@@ -271,7 +272,7 @@ public class RoleServiceImpl implements RoleService {
             return ReplyHelper.fail("ID不存在,未更新数据");
         }
 
-        if (role.getTenantId() == null && role.getBuiltin()){
+        if (role.getTenantId() == null && role.getBuiltin()) {
             return ReplyHelper.fail("角色模板不能添加角色成员");
         }
 

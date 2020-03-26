@@ -21,7 +21,7 @@ public class QueueConfig {
     /**
      * process queue
      */
-    private final static String PROCESS_QUEUE_NAME = "insight.organize";
+    private final static String PROCESS_QUEUE_NAME = "insight.role";
 
     /**
      * dlx exchange name
@@ -31,7 +31,7 @@ public class QueueConfig {
     /**
      * delay queue
      */
-    public final static String DELAY_QUEUE_NAME = "dlx.insight.organize";
+    public final static String DELAY_QUEUE_NAME = "dlx.insight.role";
 
     /**
      * dlx exchange

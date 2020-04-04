@@ -124,8 +124,7 @@ public interface CoreMapper {
      * @param key      查询关键词
      * @return 操作日志列表
      */
-    @Select("<script>select id, type, business, business_id, creator, creator_id, created_time " +
-            "from ibl_operate_log where business = #{business} " +
+    @Select("<script>select id, type, business, business_id, creator, creator_id, created_time from ibl_operate_log where business = #{business} " +
             "<if test = 'tenantId != null'>and tenant_id = #{tenantId} </if>" +
             "<if test = 'tenantId == null'>and tenant_id is null </if>" +
             "<if test = 'key!=null'>and (type = #{key} or business = #{key} or business_id = #{key} or creator = #{key} or creator_id = #{key}) </if>" +

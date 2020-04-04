@@ -1,10 +1,14 @@
 package com.insight.base.role.common;
 
 import com.insight.base.role.common.dto.FuncPermitDto;
+import com.insight.base.role.common.dto.RoleDto;
 import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.CoreMapper;
 import com.insight.util.Generator;
-import com.insight.util.pojo.*;
+import com.insight.util.pojo.Log;
+import com.insight.util.pojo.LoginInfo;
+import com.insight.util.pojo.MemberDto;
+import com.insight.util.pojo.OperateType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;

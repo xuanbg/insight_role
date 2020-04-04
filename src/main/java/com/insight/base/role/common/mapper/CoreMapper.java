@@ -113,7 +113,7 @@ public interface CoreMapper {
      */
     @Insert("insert ibl_operate_log(id, tenant_id, type, business, business_id, content, creator, creator_id, created_time) values " +
             "(#{id}, #{tenantId}, #{type}, #{business}, #{businessId}, #{content, typeHandler = com.insight.util.common.JsonTypeHandler}, " +
-            "#{deptId}, #{creator}, #{creatorId}, #{createdTime});")
+            "#{creator}, #{creatorId}, #{createdTime});")
     void addLog(Log log);
 
     /**

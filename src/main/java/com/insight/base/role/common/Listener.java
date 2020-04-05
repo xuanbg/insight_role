@@ -2,7 +2,7 @@ package com.insight.base.role.common;
 
 import com.insight.base.role.common.config.QueueConfig;
 import com.insight.base.role.common.dto.RoleDto;
-import com.insight.util.Json;
+import com.insight.utils.Json;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

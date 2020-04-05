@@ -2,9 +2,9 @@ package com.insight.base.role.manage;
 
 import com.insight.base.role.common.dto.FuncPermitDto;
 import com.insight.base.role.common.entity.Role;
-import com.insight.util.pojo.LoginInfo;
-import com.insight.util.pojo.MemberDto;
-import com.insight.util.pojo.Reply;
+import com.insight.utils.pojo.LoginInfo;
+import com.insight.utils.pojo.MemberDto;
+import com.insight.utils.pojo.Reply;
 
 import java.util.List;
 

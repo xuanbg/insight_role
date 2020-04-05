@@ -6,14 +6,13 @@ import com.insight.base.role.common.Core;
 import com.insight.base.role.common.dto.*;
 import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.RoleMapper;
-import com.insight.util.ReplyHelper;
-import com.insight.util.pojo.*;
+import com.insight.utils.ReplyHelper;
+import com.insight.utils.Util;
+import com.insight.utils.pojo.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static com.insight.util.Generator.uuid;
 
 /**
  * @author 宣炳刚
@@ -203,7 +202,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Reply newRole(LoginInfo info, Role dto) {
-        String id = uuid();
+        String id = Util.uuid();
         dto.setId(id);
         dto.setTenantId(info.getTenantId());
         dto.setCreator(info.getUserName());

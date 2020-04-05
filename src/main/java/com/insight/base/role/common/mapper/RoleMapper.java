@@ -2,7 +2,7 @@ package com.insight.base.role.common.mapper;
 
 import com.insight.base.role.common.dto.*;
 import com.insight.base.role.common.entity.Role;
-import com.insight.util.pojo.MemberDto;
+import com.insight.utils.pojo.MemberDto;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -90,7 +90,7 @@ public interface RoleMapper {
      */
     @Select("<script>select a.id, a.`name`, a.alias from ibs_application a " +
             "<if test = 'tenantId != null'>join ibt_tenant_app r on r.app_id = a.id and r.tenant_id = #{tenantId} </if>" +
-            "where a.is_auto_tenant is not null order by a.`index`</script>")
+            "where a.permit_life > 0 order by a.`index`</script>")
     List<AppListDto> getApps(String tenantId);
 
     /**

@@ -79,7 +79,7 @@ public interface RoleMapper {
             "select f.id, f.nav_id as parent_id, ifnull(p.permit, 2) + 3 as type, f.index, f.name, p.permit, a.index as i1, n.index as i2, m.index as i3, f.index as i4 " +
             "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
             "join ibs_navigator m on m.parent_id = n.id join ibs_function f on f.nav_id = m.id " +
-            "left join ibr_role_func_permit p on p.role_id = r.id and p.function_id = f.id where r.id = #{id}) t order by i1, i2, i3, i4;")
+            "left join ibr_role_permit p on p.role_id = r.id and p.function_id = f.id where r.id = #{id}) t order by i1, i2, i3, i4;")
     List<FuncPermitDto> getFuncPermits(String id);
 
     /**
@@ -144,7 +144,7 @@ public interface RoleMapper {
      * @param id 角色ID
      */
     @Delete("delete r, d, f, m from ibr_role r left join ibr_role_data_permit d on d.role_id = r.id " +
-            "left join ibr_role_func_permit f on f.role_id = r.id " +
+            "left join ibr_role_permit f on f.role_id = r.id " +
             "left join ibr_role_member m on m.role_id = r.id where r.id = #{id};")
     void deleteRole(String id);
 

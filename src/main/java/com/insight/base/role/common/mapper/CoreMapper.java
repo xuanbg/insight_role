@@ -32,7 +32,7 @@ public interface CoreMapper {
      * @param id 角色模板ID
      * @return 角色功能授权集合
      */
-    @Select("select function_id as id, permit from ibr_role_func_permit where role_id = #{id};")
+    @Select("select function_id as id, permit from ibr_role_permit where role_id = #{id};")
     List<FuncPermitDto> getFuncPermits(String id);
 
     /**
@@ -63,7 +63,7 @@ public interface CoreMapper {
      * @param funcId 功能ID
      * @return 功能授权信息
      */
-    @Select("select * from ibr_role_func_permit where role_id = #{id} and function_id = #{funcId};")
+    @Select("select * from ibr_role_permit where role_id = #{id} and function_id = #{funcId};")
     FuncPermitDto getFuncPermit(@Param("id") String id, @Param("funcId") String funcId);
 
     /**
@@ -73,7 +73,7 @@ public interface CoreMapper {
      * @param funcId 功能ID
      * @param permit 授权状态
      */
-    @Insert("insert ibr_role_func_permit (id, role_id, function_id, permit) values (replace(uuid(), '-', ''), #{id}, #{funcId}, #{permit});")
+    @Insert("insert ibr_role_permit (id, role_id, function_id, permit) values (replace(uuid(), '-', ''), #{id}, #{funcId}, #{permit});")
     void addFuncPermit(@Param("id") String id, @Param("funcId") String funcId, @Param("permit") Boolean permit);
 
     /**
@@ -83,7 +83,7 @@ public interface CoreMapper {
      * @param funcId 功能ID
      * @param permit 授权状态
      */
-    @Update("update ibr_role_func_permit set permit = #{permit} where role_id = #{id} and function_id = #{funcId};")
+    @Update("update ibr_role_permit set permit = #{permit} where role_id = #{id} and function_id = #{funcId};")
     void setFuncPermit(@Param("id") String id, @Param("funcId") String funcId, @Param("permit") Boolean permit);
 
     /**
@@ -92,7 +92,7 @@ public interface CoreMapper {
      * @param id     角色ID
      * @param funcId 功能ID
      */
-    @Delete("delete from ibr_role_func_permit where role_id = #{id} and function_id = #{funcId};")
+    @Delete("delete from ibr_role_permit where role_id = #{id} and function_id = #{funcId};")
     void removeFuncPermit(@Param("id") String id, @Param("funcId") String funcId);
 
     /**
@@ -101,7 +101,7 @@ public interface CoreMapper {
      * @param id      角色ID
      * @param permits 角色功能授权集合
      */
-    @Insert("<script>insert ibr_role_func_permit (id, role_id, function_id, permit) values " +
+    @Insert("<script>insert ibr_role_permit (id, role_id, function_id, permit) values " +
             "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
             "(replace(uuid(), '-', ''), #{id}, #{item.id}, #{item.permit})</foreach>;</script>")
     void addFuncPermits(@Param("id") String id, @Param("list") List<FuncPermitDto> permits);

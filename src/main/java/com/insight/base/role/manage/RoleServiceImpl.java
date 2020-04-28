@@ -205,6 +205,7 @@ public class RoleServiceImpl implements RoleService {
         String id = Util.uuid();
         dto.setId(id);
         dto.setTenantId(info.getTenantId());
+        dto.setBuiltin(info.getTenantId() == null && !"9dd99dd9e6df467a8207d05ea5581125".equals(dto.getAppId()));
         dto.setCreator(info.getUserName());
         dto.setCreatorId(info.getUserId());
         dto.setCreatedTime(LocalDateTime.now());

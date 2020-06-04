@@ -3,6 +3,8 @@ package com.insight.base.role.manage;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.insight.base.role.common.Core;
+import com.insight.base.role.common.client.LogClient;
+import com.insight.base.role.common.client.LogServiceClient;
 import com.insight.base.role.common.dto.*;
 import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.RoleMapper;
@@ -21,17 +23,21 @@ import java.util.List;
  */
 @Service
 public class RoleServiceImpl implements RoleService {
+    private static final String BUSINESS = "角色管理";
     private final RoleMapper mapper;
+    private final LogServiceClient client;
     private final Core core;
 
     /**
      * 构造方法
      *
      * @param mapper RoleMapper
+     * @param client LogServiceClient
      * @param core   Core
      */
-    public RoleServiceImpl(RoleMapper mapper, Core core) {
+    public RoleServiceImpl(RoleMapper mapper, LogServiceClient client, Core core) {
         this.mapper = mapper;
+        this.client = client;
         this.core = core;
     }
 
@@ -211,7 +217,7 @@ public class RoleServiceImpl implements RoleService {
         dto.setCreatedTime(LocalDateTime.now());
 
         core.addRole(dto);
-        core.writeLog(info, OperateType.INSERT, "角色管理", id, dto);
+        LogClient.writeLog(info, BUSINESS, OperateType.INSERT, id, dto);
 
         return ReplyHelper.created(id);
     }
@@ -232,7 +238,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         mapper.updateRole(dto);
-        core.writeLog(info, OperateType.UPDATE, "角色管理", id, dto);
+        LogClient.writeLog(info, BUSINESS, OperateType.UPDATE, id, dto);
 
         return ReplyHelper.success();
     }
@@ -252,7 +258,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         mapper.deleteRole(id);
-        core.writeLog(info, OperateType.DELETE, "角色管理", id, role);
+        LogClient.writeLog(info, BUSINESS, OperateType.DELETE, id, role);
 
         return ReplyHelper.success();
     }
@@ -277,7 +283,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         core.addMembers(id, members);
-        core.writeLog(info, OperateType.INSERT, "角色管理", id, members);
+        LogClient.writeLog(info, BUSINESS, OperateType.INSERT, id, members);
 
         return ReplyHelper.success();
     }
@@ -298,7 +304,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         mapper.removeMember(id, member);
-        core.writeLog(info, OperateType.DELETE, "角色管理", id, member);
+        LogClient.writeLog(info, BUSINESS, OperateType.DELETE, id, member);
 
         return ReplyHelper.success();
     }
@@ -319,7 +325,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         core.setFuncPermit(id, permit);
-        core.writeLog(info, OperateType.DELETE, "角色管理", id, permit);
+        LogClient.writeLog(info, BUSINESS, OperateType.DELETE, id, permit);
 
         return ReplyHelper.success();
     }
@@ -335,11 +341,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Reply getRoleLogs(String tenantId, String keyword, int page, int size) {
-        PageHelper.startPage(page, size);
-        List<Log> logs = core.getLogs(tenantId, "角色管理", keyword);
-        PageInfo<Log> pageInfo = new PageInfo<>(logs);
-
-        return ReplyHelper.success(logs, pageInfo.getTotal());
+        return client.getLogs(BUSINESS, keyword, page, size);
     }
 
     /**
@@ -350,11 +352,6 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Reply getRoleLog(String id) {
-        Log log = core.getLog(id);
-        if (log == null) {
-            return ReplyHelper.fail("ID不存在,未读取数据");
-        }
-
-        return ReplyHelper.success(log);
+        return client.getLog(id);
     }
 }

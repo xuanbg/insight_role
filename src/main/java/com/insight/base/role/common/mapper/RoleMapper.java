@@ -143,9 +143,7 @@ public interface RoleMapper {
      *
      * @param id 角色ID
      */
-    @Delete("delete r, d, f, m from ibr_role r left join ibr_role_data_permit d on d.role_id = r.id " +
-            "left join ibr_role_permit f on f.role_id = r.id " +
-            "left join ibr_role_member m on m.role_id = r.id where r.id = #{id};")
+    @Delete("delete r, f, m from ibr_role r left join ibr_role_permit f on f.role_id = r.id left join ibr_role_member m on m.role_id = r.id where r.id = #{id};")
     void deleteRole(String id);
 
     /**

@@ -38,8 +38,8 @@ import java.util.stream.Collectors;
 @ResponseBody
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    private static Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-    private static Error error = new Error();
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Error ERROR = new Error();
 
     /**
      * 处理缺少请求参数的异常
@@ -246,11 +246,11 @@ public class GlobalExceptionHandler {
             message = ex.getClass().getSimpleName();
         }
 
-        error.setRequestId();
-        error.setError(message);
-        error.setException(ex.getStackTrace());
+        ERROR.setRequestId();
+        ERROR.setError(message);
+        ERROR.setException(ex.getStackTrace());
 
-        logger.error("发生异常: {}", error.toString());
+        logger.error("发生异常: {}", ERROR.toString());
     }
 
     /**

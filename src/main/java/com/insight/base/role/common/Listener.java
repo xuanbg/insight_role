@@ -47,7 +47,6 @@ public class Listener {
             core.addRoleFromTemplate(Json.toBean(body, RoleDto.class));
         } catch (Exception ex) {
             logger.error("发生异常: {}", ex.getMessage());
-
             channel.basicPublish(QueueConfig.DELAY_EXCHANGE_NAME, QueueConfig.DELAY_QUEUE_NAME, null, message.getBody());
         }
     }

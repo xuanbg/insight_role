@@ -325,7 +325,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         core.setFuncPermit(id, permit);
-        LogClient.writeLog(info, BUSINESS, OperateType.DELETE, id, permit);
+        LogClient.writeLog(info, BUSINESS, OperateType.UPDATE, id, permit);
 
         return ReplyHelper.success();
     }

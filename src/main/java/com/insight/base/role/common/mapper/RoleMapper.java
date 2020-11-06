@@ -135,7 +135,7 @@ public interface RoleMapper {
      *
      * @param role 角色DTO
      */
-    @Update("update ibr_role set name = #{name}, remark = #{remark} where id = #{id};")
+    @Update("update ibr_role set app_id = #{appId}, name = #{name}, remark = #{remark} where id = #{id};")
     void updateRole(Role role);
 
     /**

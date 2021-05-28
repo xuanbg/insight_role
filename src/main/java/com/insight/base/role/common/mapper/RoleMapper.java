@@ -27,7 +27,7 @@ public interface RoleMapper {
             "<if test = 'tenantId == null'>r.tenant_id is null </if>" +
             "<if test = 'key != null'>and (r.name like concat('%',#{key},'%') or a.name like concat('%',#{key},'%')) </if>" +
             "order by r.created_time</script>")
-    List<RoleListDto> getRoles(@Param("tenantId") String tenantId, @Param("key") String key);
+    List<RoleListDto> getRoles(@Param("tenantId") Long tenantId, @Param("key") String key);
 
     /**
      * 获取角色详情
@@ -36,7 +36,7 @@ public interface RoleMapper {
      * @return 角色详情
      */
     @Select("select r.*, a.name from ibr_role r join ibs_application a on a.id = r.app_id where r.id = #{id};")
-    Role getRole(String id);
+    Role getRole(Long id);
 
     /**
      * 获取角色成员
@@ -47,7 +47,7 @@ public interface RoleMapper {
     @Select("select u.id, '1' as parent_id, m.type, u.name from ibr_role_member m join ibu_user u on u.id = m.member_id where m.role_id = #{id} union all " +
             "select g.id, '2' as parent_id, m.type, g.name from ibr_role_member m join ibu_group g on g.id = m.member_id where m.role_id = #{id} union all " +
             "select o.id, '3' as parent_id, m.type, o.full_name as name from ibr_role_member m join ibo_organize o on o.id = m.member_id where m.role_id = #{id};")
-    List<MemberDto> getMembers(String id);
+    List<MemberDto> getMembers(Long id);
 
     /**
      * 查询角色成员用户
@@ -59,7 +59,7 @@ public interface RoleMapper {
     @Select("<script>select u.id, u.code, u.name, u.account, u.mobile, u.is_invalid from ibv_user_roles m join ibu_user u on u.id = m.user_id " +
             "<if test = 'key != null'>and (u.code = #{key} or u.account = #{key} or u.name like concat('%',#{key},'%')) </if>" +
             "where m.role_id = #{id} order by u.created_time</script>")
-    List<MemberUserDto> getMemberUsers(@Param("id") String id, @Param("key") String key);
+    List<MemberUserDto> getMemberUsers(@Param("id") Long id, @Param("key") String key);
 
     /**
      * 获取角色功能权限列表
@@ -80,7 +80,7 @@ public interface RoleMapper {
             "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
             "join ibs_navigator m on m.parent_id = n.id join ibs_function f on f.nav_id = m.id " +
             "left join ibr_role_permit p on p.role_id = r.id and p.function_id = f.id where r.id = #{id}) t order by i1, i2, i3, i4;")
-    List<FuncPermitDto> getFuncPermits(String id);
+    List<FuncPermitDto> getFuncPermits(Long id);
 
     /**
      * 获取角色可选应用列表
@@ -91,7 +91,7 @@ public interface RoleMapper {
     @Select("<script>select a.id, a.`name`, a.alias from ibs_application a " +
             "<if test = 'tenantId != null'>join ibt_tenant_app r on r.app_id = a.id and r.tenant_id = #{tenantId} </if>" +
             "where a.permit_life > 0 order by a.`index`</script>")
-    List<AppListDto> getApps(String tenantId);
+    List<AppListDto> getApps(Long tenantId);
 
     /**
      * 获取角色可选用户成员
@@ -104,7 +104,7 @@ public interface RoleMapper {
             "<if test = 'tenantId != null'>join ibt_tenant_user r on r.user_id = u.id and r.tenant_id = #{tenantId} </if>" +
             "left join ibr_role_member m on m.member_id = u.id and m.type = 1 and m.role_id = #{roleId} " +
             "where u.is_invalid = 0 and m.id is null order by u.created_time</script>")
-    List<RoleMemberDto> getMemberOfUser(@Param("tenantId") String tenantId, @Param("roleId") String roleId);
+    List<RoleMemberDto> getMemberOfUser(@Param("tenantId") Long tenantId, @Param("roleId") Long roleId);
 
     /**
      * 获取角色可选用户组成员
@@ -116,7 +116,7 @@ public interface RoleMapper {
     @Select("select g.id, '2' as parent_id, 2 as type, g.`name`, g.remark from ibu_group g " +
             "left join ibr_role_member m on m.member_id = g.id and m.type = 2 and m.role_id = #{roleId} " +
             "where g.tenant_id = #{tenantId} and m.id is null order by g.created_time;")
-    List<RoleMemberDto> getMemberOfGroup(@Param("tenantId") String tenantId, @Param("roleId") String roleId);
+    List<RoleMemberDto> getMemberOfGroup(@Param("tenantId") Long tenantId, @Param("roleId") Long roleId);
 
     /**
      * 获取角色可选职位成员
@@ -128,7 +128,7 @@ public interface RoleMapper {
     @Select("select o.id, o.parent_id, o.type, o.`index`, o.`name`, o.remark from ibo_organize o " +
             "left join ibr_role_member m on m.member_id = o.id and m.type = 3 and m.role_id = #{roleId} " +
             "where o.tenant_id = #{tenantId} and m.id is null order by o.`index`;")
-    List<RoleMemberDto> getMemberOfTitle(@Param("tenantId") String tenantId, @Param("roleId") String roleId);
+    List<RoleMemberDto> getMemberOfTitle(@Param("tenantId") Long tenantId, @Param("roleId") Long roleId);
 
     /**
      * 更新角色
@@ -144,7 +144,7 @@ public interface RoleMapper {
      * @param id 角色ID
      */
     @Delete("delete r, f, m from ibr_role r left join ibr_role_permit f on f.role_id = r.id left join ibr_role_member m on m.role_id = r.id where r.id = #{id};")
-    void deleteRole(String id);
+    void deleteRole(Long id);
 
     /**
      * 移除角色成员
@@ -153,7 +153,7 @@ public interface RoleMapper {
      * @param member 角色成员DTO
      */
     @Delete("delete from ibr_role_member where type = #{member.type} and role_id = #{id} and member_id = #{member.id};")
-    void removeMember(@Param("id") String id, @Param("member") MemberDto member);
+    void removeMember(@Param("id") Long id, @Param("member") MemberDto member);
 
     /**
      * 添加角色数据授权
@@ -161,10 +161,10 @@ public interface RoleMapper {
      * @param id      角色ID
      * @param permits 角色数据授权集合
      */
-    @Insert("<script>insert ibr_role_data_permit (id, role_id, module_id, mode, owner_id, permit) values " +
+    @Insert("<script>insert ibr_role_data_permit (role_id, module_id, mode, owner_id, permit) values " +
             "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
-            "(replace(uuid(), '-', ''), #{id}, #{item.moduleId}, #{item.mode}, #{item.id}, #{item.permit})</foreach>;</script>")
-    void addDataPermits(@Param("id") String id, @Param("list") List<DataPermitDto> permits);
+            "(#{id}, #{item.moduleId}, #{item.mode}, #{item.id}, #{item.permit})</foreach>;</script>")
+    void addDataPermits(@Param("id") Long id, @Param("list") List<DataPermitDto> permits);
 
     /**
      * 移除角色数据授权
@@ -172,5 +172,5 @@ public interface RoleMapper {
      * @param id 角色ID
      */
     @Delete("delete from ibr_role_data_permit where role_id = #{id};")
-    void removeDataPermits(String id);
+    void removeDataPermits(Long id);
 }

@@ -1,26 +1,23 @@
 package com.insight.base.role.common.dto;
 
-import com.insight.utils.Json;
-
-import java.io.Serializable;
+import com.insight.utils.pojo.BaseXo;
 
 /**
  * @author 宣炳刚
  * @date 2020/3/15
  * @remark 角色成员DTO
  */
-public class RoleMemberDto implements Serializable {
-    private static final long serialVersionUID = -1L;
+public class RoleMemberDto extends BaseXo {
 
     /**
      * 成员唯一ID
      */
-    private String id;
+    private Long id;
 
     /**
      * 父ID
      */
-    private String parentId;
+    private Long parentId;
 
     /**
      * 级别
@@ -42,19 +39,19 @@ public class RoleMemberDto implements Serializable {
      */
     private String remark;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getParentId() {
+    public Long getParentId() {
         return parentId;
     }
 
-    public void setParentId(String parentId) {
+    public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
 
@@ -88,10 +85,5 @@ public class RoleMemberDto implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
-    }
-
-    @Override
-    public String toString() {
-        return Json.toJson(this);
     }
 }

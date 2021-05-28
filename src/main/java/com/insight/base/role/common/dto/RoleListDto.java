@@ -1,26 +1,23 @@
 package com.insight.base.role.common.dto;
 
-import com.insight.utils.Json;
-
-import java.io.Serializable;
+import com.insight.utils.pojo.BaseXo;
 
 /**
  * @author 宣炳刚
  * @date 2019/12/4
  * @remark 角色列表DTO
  */
-public class RoleListDto implements Serializable {
-    private static final long serialVersionUID = -1L;
+public class RoleListDto extends BaseXo {
 
     /**
      * 角色ID
      */
-    private String id;
+    private Long id;
 
     /**
      * 应用ID
      */
-    private String appId;
+    private Long appId;
 
     /**
      * 应用名称
@@ -42,19 +39,19 @@ public class RoleListDto implements Serializable {
      */
     private Boolean isBuiltin;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getAppId() {
+    public Long getAppId() {
         return appId;
     }
 
-    public void setAppId(String appId) {
+    public void setAppId(Long appId) {
         this.appId = appId;
     }
 
@@ -88,10 +85,5 @@ public class RoleListDto implements Serializable {
 
     public void setBuiltin(Boolean builtin) {
         isBuiltin = builtin;
-    }
-
-    @Override
-    public String toString() {
-        return Json.toJson(this);
     }
 }

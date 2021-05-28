@@ -9,7 +9,7 @@ import com.insight.base.role.common.dto.*;
 import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.RoleMapper;
 import com.insight.utils.ReplyHelper;
-import com.insight.utils.Util;
+import com.insight.utils.SnowflakeCreator;
 import com.insight.utils.pojo.*;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +24,7 @@ import java.util.List;
 @Service
 public class RoleServiceImpl implements RoleService {
     private static final String BUSINESS = "角色管理";
+    private final SnowflakeCreator creator;
     private final RoleMapper mapper;
     private final LogServiceClient client;
     private final Core core;
@@ -31,11 +32,13 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 构造方法
      *
-     * @param mapper RoleMapper
-     * @param client LogServiceClient
-     * @param core   Core
+     * @param creator 雪花算法ID生成器
+     * @param mapper  RoleMapper
+     * @param client  LogServiceClient
+     * @param core    Core
      */
-    public RoleServiceImpl(RoleMapper mapper, LogServiceClient client, Core core) {
+    public RoleServiceImpl(SnowflakeCreator creator, RoleMapper mapper, LogServiceClient client, Core core) {
+        this.creator = creator;
         this.mapper = mapper;
         this.client = client;
         this.core = core;
@@ -44,16 +47,13 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 查询角色列表
      *
-     * @param tenantId 租户ID
-     * @param keyword  查询关键词
-     * @param page     分页页码
-     * @param size     每页记录数
+     * @param search 查询实体类
      * @return Reply
      */
     @Override
-    public Reply getRoles(String tenantId, String keyword, int page, int size) {
-        PageHelper.startPage(page, size);
-        List<RoleListDto> groups = mapper.getRoles(tenantId, keyword);
+    public Reply getRoles(SearchDto search) {
+        PageHelper.startPage(search.getPage(), search.getSize());
+        List<RoleListDto> groups = mapper.getRoles(search.getTenantId(), search.getKeyword());
         PageInfo<RoleListDto> pageInfo = new PageInfo<>(groups);
 
         return ReplyHelper.success(groups, pageInfo.getTotal());
@@ -66,7 +66,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getRole(String id) {
+    public Reply getRole(Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未读取数据");
@@ -82,7 +82,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getMembers(String id) {
+    public Reply getMembers(Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未读取数据");
@@ -95,21 +95,19 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 查询角色成员用户
      *
-     * @param id      角色ID
-     * @param keyword 查询关键词
-     * @param page    分页页码
-     * @param size    每页记录数
+     * @param id     角色ID
+     * @param search 查询实体类
      * @return Reply
      */
     @Override
-    public Reply getMemberUsers(String id, String keyword, int page, int size) {
+    public Reply getMemberUsers(Long id, SearchDto search) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未读取数据");
         }
 
-        PageHelper.startPage(page, size);
-        List<MemberUserDto> users = mapper.getMemberUsers(id, keyword);
+        PageHelper.startPage(search.getPage(), search.getSize());
+        List<MemberUserDto> users = mapper.getMemberUsers(id, search.getKeyword());
         PageInfo<MemberUserDto> pageInfo = new PageInfo<>(users);
 
         return ReplyHelper.success(users, pageInfo.getTotal());
@@ -122,7 +120,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getFuncPermits(String id) {
+    public Reply getFuncPermits(Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未读取数据");
@@ -139,7 +137,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getApps(String tenantId) {
+    public Reply getApps(Long tenantId) {
         List<AppListDto> apps = mapper.getApps(tenantId);
 
         return ReplyHelper.success(apps);
@@ -153,7 +151,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getMemberOfUser(String tenantId, String id) {
+    public Reply getMemberOfUser(Long tenantId, Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未读取数据");
@@ -171,7 +169,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getMemberOfGroup(String tenantId, String id) {
+    public Reply getMemberOfGroup(Long tenantId, Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未读取数据");
@@ -189,7 +187,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getMemberOfTitle(String tenantId, String id) {
+    public Reply getMemberOfTitle(Long tenantId, Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未读取数据");
@@ -208,10 +206,10 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Reply newRole(LoginInfo info, Role dto) {
-        String id = Util.uuid();
+        Long id = creator.nextId(7);
         dto.setId(id);
         dto.setTenantId(info.getTenantId());
-        dto.setBuiltin(info.getTenantId() == null && !"9dd99dd9e6df467a8207d05ea5581125".equals(dto.getAppId()));
+        dto.setBuiltin(info.getTenantId() == null && !dto.getAppId().equals(134660498556715024L));
         dto.setCreator(info.getUserName());
         dto.setCreatorId(info.getUserId());
         dto.setCreatedTime(LocalDateTime.now());
@@ -231,7 +229,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Reply editRole(LoginInfo info, Role dto) {
-        String id = dto.getId();
+        Long id = dto.getId();
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未更新数据");
@@ -251,7 +249,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply deleteRole(LoginInfo info, String id) {
+    public Reply deleteRole(LoginInfo info, Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未删除数据");
@@ -272,7 +270,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply addMembers(LoginInfo info, String id, List<MemberDto> members) {
+    public Reply addMembers(LoginInfo info, Long id, List<MemberDto> members) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未更新数据");
@@ -297,7 +295,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply removeMember(LoginInfo info, String id, MemberDto member) {
+    public Reply removeMember(LoginInfo info, Long id, MemberDto member) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未删除数据");
@@ -318,7 +316,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply setFuncPermit(LoginInfo info, String id, FuncPermitDto permit) {
+    public Reply setFuncPermit(LoginInfo info, Long id, FuncPermitDto permit) {
         Role role = mapper.getRole(id);
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未更新数据");
@@ -333,14 +331,12 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 获取日志列表
      *
-     * @param keyword 查询关键词
-     * @param page    分页页码
-     * @param size    每页记录数
+     * @param search 查询实体类
      * @return Reply
      */
     @Override
-    public Reply getRoleLogs(String keyword, int page, int size) {
-        return client.getLogs(BUSINESS, keyword, page, size);
+    public Reply getRoleLogs(SearchDto search) {
+        return client.getLogs(BUSINESS, search.getKeyword(), search.getPage(), search.getSize());
     }
 
     /**
@@ -350,7 +346,7 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getRoleLog(String id) {
+    public Reply getRoleLog(Long id) {
         return client.getLog(id);
     }
 }

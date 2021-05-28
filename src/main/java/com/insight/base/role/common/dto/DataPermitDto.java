@@ -1,26 +1,23 @@
 package com.insight.base.role.common.dto;
 
-import com.insight.utils.Json;
-
-import java.io.Serializable;
+import com.insight.utils.pojo.BaseXo;
 
 /**
  * @author 宣炳刚
  * @date 2019/12/6
  * @remark 角色成员DTO
  */
-public class DataPermitDto implements Serializable {
-    private static final long serialVersionUID = -1L;
+public class DataPermitDto extends BaseXo {
 
     /**
      * 数据所有者ID,相对模式下为模式ID
      */
-    private String id;
+    private Long id;
 
     /**
      * 业务模块ID
      */
-    private String moduleId;
+    private Long moduleId;
 
     /**
      * 业务模块名称
@@ -47,19 +44,19 @@ public class DataPermitDto implements Serializable {
      */
     private Boolean permit;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getModuleId() {
+    public Long getModuleId() {
         return moduleId;
     }
 
-    public void setModuleId(String moduleId) {
+    public void setModuleId(Long moduleId) {
         this.moduleId = moduleId;
     }
 
@@ -101,10 +98,5 @@ public class DataPermitDto implements Serializable {
 
     public void setPermit(Boolean permit) {
         this.permit = permit;
-    }
-
-    @Override
-    public String toString() {
-        return Json.toJson(this);
     }
 }

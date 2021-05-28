@@ -22,7 +22,7 @@ public interface CoreMapper {
      * @return 角色模板
      */
     @Select("select * from ibr_role where app_id = #{appId} and tenant_id is null and is_builtin = 1;")
-    List<Role> getTemplates(String appId);
+    List<Role> getTemplates(Long appId);
 
     /**
      * 获取模板角色功能授权集合
@@ -31,7 +31,7 @@ public interface CoreMapper {
      * @return 角色功能授权集合
      */
     @Select("select function_id as id, permit from ibr_role_permit where role_id = #{id};")
-    List<FuncPermitDto> getFuncPermits(String id);
+    List<FuncPermitDto> getFuncPermits(Long id);
 
     /**
      * 新增角色
@@ -48,11 +48,11 @@ public interface CoreMapper {
      * @param id      角色ID
      * @param members 角色成员集合
      */
-    @Insert("<script>insert ibr_role_member (id, type, role_id, member_id) values " +
+    @Insert("<script>insert ibr_role_member (type, role_id, member_id) values " +
             "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
-            "(replace(uuid(), '-', ''), #{item.type}, #{id}, #{item.id})</foreach>;</script>")
+            "(#{item.type}, #{id}, #{item.id})</foreach>;</script>")
     void
-    addMembers(@Param("id") String id, @Param("list") List<MemberDto> members);
+    addMembers(@Param("id") Long id, @Param("list") List<MemberDto> members);
 
     /**
      * 获取指定角色ID和功能ID的功能授权信息
@@ -62,7 +62,7 @@ public interface CoreMapper {
      * @return 功能授权信息
      */
     @Select("select * from ibr_role_permit where role_id = #{id} and function_id = #{funcId};")
-    FuncPermitDto getFuncPermit(@Param("id") String id, @Param("funcId") String funcId);
+    FuncPermitDto getFuncPermit(@Param("id") Long id, @Param("funcId") Long funcId);
 
     /**
      * 添加角色功能授权
@@ -72,7 +72,7 @@ public interface CoreMapper {
      * @param permit 授权状态
      */
     @Insert("insert ibr_role_permit (id, role_id, function_id, permit) values (replace(uuid(), '-', ''), #{id}, #{funcId}, #{permit});")
-    void addFuncPermit(@Param("id") String id, @Param("funcId") String funcId, @Param("permit") Boolean permit);
+    void addFuncPermit(@Param("id") Long id, @Param("funcId") Long funcId, @Param("permit") Boolean permit);
 
     /**
      * 更新角色功能授权
@@ -82,7 +82,7 @@ public interface CoreMapper {
      * @param permit 授权状态
      */
     @Update("update ibr_role_permit set permit = #{permit} where role_id = #{id} and function_id = #{funcId};")
-    void setFuncPermit(@Param("id") String id, @Param("funcId") String funcId, @Param("permit") Boolean permit);
+    void setFuncPermit(@Param("id") Long id, @Param("funcId") Long funcId, @Param("permit") Boolean permit);
 
     /**
      * 移除角色功能授权
@@ -91,7 +91,7 @@ public interface CoreMapper {
      * @param funcId 功能ID
      */
     @Delete("delete from ibr_role_permit where role_id = #{id} and function_id = #{funcId};")
-    void removeFuncPermit(@Param("id") String id, @Param("funcId") String funcId);
+    void removeFuncPermit(@Param("id") Long id, @Param("funcId") Long funcId);
 
     /**
      * 添加角色功能授权
@@ -102,5 +102,5 @@ public interface CoreMapper {
     @Insert("<script>insert ibr_role_permit (id, role_id, function_id, permit) values " +
             "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
             "(replace(uuid(), '-', ''), #{id}, #{item.id}, #{item.permit})</foreach>;</script>")
-    void addFuncPermits(@Param("id") String id, @Param("list") List<FuncPermitDto> permits);
+    void addFuncPermits(@Param("id") Long id, @Param("list") List<FuncPermitDto> permits);
 }

@@ -7,6 +7,7 @@ import com.insight.utils.ReplyHelper;
 import com.insight.utils.pojo.LoginInfo;
 import com.insight.utils.pojo.MemberDto;
 import com.insight.utils.pojo.Reply;
+import com.insight.utils.pojo.SearchDto;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,18 +36,16 @@ public class RoleController {
     /**
      * 查询角色列表
      *
-     * @param info    用户关键信息
-     * @param keyword 查询关键词
-     * @param page    分页页码
-     * @param size    每页记录数
+     * @param info   用户关键信息
+     * @param search 查询实体类
      * @return Reply
      */
     @GetMapping("/v1.0/roles")
-    public Reply getRoles(@RequestHeader("loginInfo") String info, @RequestParam(required = false) String keyword,
-                          @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
+    public Reply getRoles(@RequestHeader("loginInfo") String info, SearchDto search) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+        search.setTenantId(loginInfo.getTenantId());
 
-        return service.getRoles(loginInfo.getTenantId(), keyword, page, size);
+        return service.getRoles(search);
     }
 
     /**
@@ -56,8 +55,8 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}")
-    public Reply getRole(@PathVariable String id) {
-        if (id == null || id.isEmpty()) {
+    public Reply getRole(@PathVariable Long id) {
+        if (id == null) {
             return ReplyHelper.invalidParam();
         }
 
@@ -71,23 +70,20 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/members")
-    public Reply getMembers(@PathVariable String id) {
+    public Reply getMembers(@PathVariable Long id) {
         return service.getMembers(id);
     }
 
     /**
      * 查询角色成员用户
      *
-     * @param id      角色ID
-     * @param keyword 查询关键词
-     * @param page    分页页码
-     * @param size    每页记录数
+     * @param id     角色ID
+     * @param search 查询实体类
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/users")
-    public Reply getMemberUsers(@PathVariable String id, @RequestParam(required = false) String keyword,
-                                @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
-        return service.getMemberUsers(id, keyword, page, size);
+    public Reply getMemberUsers(@PathVariable Long id, SearchDto search) {
+        return service.getMemberUsers(id, search);
     }
 
     /**
@@ -97,7 +93,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/funcs")
-    public Reply getFuncPermits(@PathVariable String id) {
+    public Reply getFuncPermits(@PathVariable Long id) {
         return service.getFuncPermits(id);
     }
 
@@ -122,7 +118,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/users/other")
-    public Reply getMemberOfUser(@RequestHeader("loginInfo") String info, @PathVariable String id) {
+    public Reply getMemberOfUser(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
         return service.getMemberOfUser(loginInfo.getTenantId(), id);
@@ -136,7 +132,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/groups/other")
-    public Reply getMemberOfGroup(@RequestHeader("loginInfo") String info, @PathVariable String id) {
+    public Reply getMemberOfGroup(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
         return service.getMemberOfGroup(loginInfo.getTenantId(), id);
@@ -150,7 +146,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/orgs/other")
-    public Reply getMemberOfTitle(@RequestHeader("loginInfo") String info, @PathVariable String id) {
+    public Reply getMemberOfTitle(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
         return service.getMemberOfTitle(loginInfo.getTenantId(), id);
@@ -192,7 +188,7 @@ public class RoleController {
      * @return Reply
      */
     @DeleteMapping("/v1.0/roles")
-    public Reply deleteRole(@RequestHeader("loginInfo") String info, @RequestBody String id) {
+    public Reply deleteRole(@RequestHeader("loginInfo") String info, @RequestBody Long id) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
         return service.deleteRole(loginInfo, id);
@@ -207,7 +203,7 @@ public class RoleController {
      * @return Reply
      */
     @PostMapping("/v1.0/roles/{id}/members")
-    public Reply addMembers(@RequestHeader("loginInfo") String info, @PathVariable String id, @RequestBody List<MemberDto> members) {
+    public Reply addMembers(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody List<MemberDto> members) {
         if (members == null || members.isEmpty()) {
             return ReplyHelper.invalidParam("请选择需要添加的成员");
         }
@@ -225,7 +221,7 @@ public class RoleController {
      * @return Reply
      */
     @DeleteMapping("/v1.0/roles/{id}/members")
-    public Reply removeMember(@RequestHeader("loginInfo") String info, @PathVariable String id, @RequestBody MemberDto member) {
+    public Reply removeMember(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody MemberDto member) {
         if (member == null) {
             return ReplyHelper.invalidParam("请选择需要移除的成员");
         }
@@ -243,7 +239,7 @@ public class RoleController {
      * @return Reply
      */
     @PutMapping("/v1.0/roles/{id}/funcs")
-    public Reply setFuncPermits(@RequestHeader("loginInfo") String info, @PathVariable String id, @RequestBody FuncPermitDto permit) {
+    public Reply setFuncPermits(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody FuncPermitDto permit) {
         if (permit == null) {
             return ReplyHelper.invalidParam("请选择需要授与的功能权限");
         }
@@ -255,15 +251,13 @@ public class RoleController {
     /**
      * 获取日志列表
      *
-     * @param keyword 查询关键词
-     * @param page    分页页码
-     * @param size    每页记录数
+     * @param search 查询实体类
      * @return Reply
      */
     @GetMapping("/v1.0/roles/logs")
-    public Reply getRoleLogs(@RequestParam(required = false) String keyword, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
+    public Reply getRoleLogs(SearchDto search) {
 
-        return service.getRoleLogs(keyword, page, size);
+        return service.getRoleLogs(search);
     }
 
     /**
@@ -273,8 +267,8 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/logs/{id}")
-    public Reply getRoleLog(@PathVariable String id) {
-        if (id == null || id.isEmpty()) {
+    public Reply getRoleLog(@PathVariable Long id) {
+        if (id == null) {
             return ReplyHelper.invalidParam();
         }
 

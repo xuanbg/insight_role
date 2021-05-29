@@ -99,8 +99,8 @@ public interface CoreMapper {
      * @param id      角色ID
      * @param permits 角色功能授权集合
      */
-    @Insert("<script>insert ibr_role_permit (id, role_id, function_id, permit) values " +
+    @Insert("<script>insert ibr_role_permit (role_id, function_id, permit) values " +
             "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
-            "(replace(uuid(), '-', ''), #{id}, #{item.id}, #{item.permit})</foreach>;</script>")
+            "#{id}, #{item.id}, #{item.permit})</foreach>;</script>")
     void addFuncPermits(@Param("id") Long id, @Param("list") List<FuncPermitDto> permits);
 }

@@ -101,6 +101,6 @@ public interface CoreMapper {
      */
     @Insert("<script>insert ibr_role_permit (role_id, function_id, permit) values " +
             "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
-            "#{id}, #{item.id}, #{item.permit})</foreach>;</script>")
+            "(#{id}, #{item.id}, #{item.permit})</foreach>;</script>")
     void addFuncPermits(@Param("id") Long id, @Param("list") List<FuncPermitDto> permits);
 }

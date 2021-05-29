@@ -71,7 +71,7 @@ public interface CoreMapper {
      * @param funcId 功能ID
      * @param permit 授权状态
      */
-    @Insert("insert ibr_role_permit (id, role_id, function_id, permit) values (replace(uuid(), '-', ''), #{id}, #{funcId}, #{permit});")
+    @Insert("insert ibr_role_permit (role_id, function_id, permit) values (#{id}, #{funcId}, #{permit});")
     void addFuncPermit(@Param("id") Long id, @Param("funcId") Long funcId, @Param("permit") Boolean permit);
 
     /**

@@ -19,15 +19,17 @@ public interface RoleMapper {
      * 获取角色列表
      *
      * @param tenantId 租户ID
+     * @param appId    应用ID
      * @param key      查询关键词
      * @return 角色列表
      */
     @Select("<script>select r.id, r.app_id, a.name as app_name, r.name, r.remark, r.is_builtin from ibr_role r join ibs_application a on a.id = r.app_id where " +
             "<if test = 'tenantId != null'>r.tenant_id = #{tenantId} </if>" +
             "<if test = 'tenantId == null'>r.tenant_id is null </if>" +
+            "<if test = 'appId != null'>r.app_id = #{appId} </if>" +
             "<if test = 'key != null'>and (r.name like concat('%',#{key},'%') or a.name like concat('%',#{key},'%')) </if>" +
             "order by r.created_time</script>")
-    List<RoleListDto> getRoles(@Param("tenantId") Long tenantId, @Param("key") String key);
+    List<RoleListDto> getRoles(@Param("tenantId") Long tenantId, @Param("appId") Long appId, @Param("key") String key);
 
     /**
      * 获取角色详情

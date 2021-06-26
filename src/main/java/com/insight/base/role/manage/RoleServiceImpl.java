@@ -53,7 +53,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Reply getRoles(SearchDto search) {
         PageHelper.startPage(search.getPage(), search.getSize());
-        List<RoleListDto> groups = mapper.getRoles(search.getTenantId(), search.getKeyword());
+        List<RoleListDto> groups = mapper.getRoles(search.getTenantId(), search.getAppId(), search.getKeyword());
         PageInfo<RoleListDto> pageInfo = new PageInfo<>(groups);
 
         return ReplyHelper.success(groups, pageInfo.getTotal());

@@ -170,11 +170,13 @@ public class RoleController {
      * 编辑角色
      *
      * @param info 用户关键信息
+     * @param id   角色ID
      * @param dto  角色DTO
      * @return Reply
      */
-    @PutMapping("/v1.0/roles")
-    public Reply editRole(@RequestHeader("loginInfo") String info, @Valid @RequestBody Role dto) {
+    @PutMapping("/v1.0/roles/{id}")
+    public Reply editRole(@RequestHeader("loginInfo") String info, @PathVariable Long id, @Valid @RequestBody Role dto) {
+        dto.setId(id);
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
         return service.editRole(loginInfo, dto);
@@ -187,8 +189,8 @@ public class RoleController {
      * @param id   角色ID
      * @return Reply
      */
-    @DeleteMapping("/v1.0/roles")
-    public Reply deleteRole(@RequestHeader("loginInfo") String info, @RequestBody Long id) {
+    @DeleteMapping("/v1.0/roles/{id}")
+    public Reply deleteRole(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
         return service.deleteRole(loginInfo, id);

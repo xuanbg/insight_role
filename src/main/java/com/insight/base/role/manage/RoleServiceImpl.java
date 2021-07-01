@@ -206,10 +206,13 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Reply newRole(LoginInfo info, Role dto) {
+        if (info.getTenantId() != null && dto.getAppId() == null){
+            return ReplyHelper.invalidParam("appId不能为空");
+        }
+
         Long id = creator.nextId(7);
         dto.setId(id);
         dto.setTenantId(info.getTenantId());
-        dto.setBuiltin(info.getTenantId() == null && !dto.getAppId().equals(134660498556715024L));
         dto.setCreator(info.getUserName());
         dto.setCreatorId(info.getUserId());
         dto.setCreatedTime(LocalDateTime.now());
@@ -229,6 +232,10 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Reply editRole(LoginInfo info, Role dto) {
+        if (info.getTenantId() != null && dto.getAppId() == null){
+            return ReplyHelper.invalidParam("appId不能为空");
+        }
+
         Long id = dto.getId();
         Role role = mapper.getRole(id);
         if (role == null) {

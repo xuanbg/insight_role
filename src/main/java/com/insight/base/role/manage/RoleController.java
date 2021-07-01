@@ -56,10 +56,6 @@ public class RoleController {
      */
     @GetMapping("/v1.0/roles/{id}")
     public Reply getRole(@PathVariable Long id) {
-        if (id == null) {
-            return ReplyHelper.invalidParam();
-        }
-
         return service.getRole(id);
     }
 
@@ -258,7 +254,6 @@ public class RoleController {
      */
     @GetMapping("/v1.0/roles/logs")
     public Reply getRoleLogs(SearchDto search) {
-
         return service.getRoleLogs(search);
     }
 
@@ -270,10 +265,6 @@ public class RoleController {
      */
     @GetMapping("/v1.0/roles/logs/{id}")
     public Reply getRoleLog(@PathVariable Long id) {
-        if (id == null) {
-            return ReplyHelper.invalidParam();
-        }
-
         return service.getRoleLog(id);
     }
 }

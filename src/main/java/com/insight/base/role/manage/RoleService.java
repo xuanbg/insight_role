@@ -2,10 +2,10 @@ package com.insight.base.role.manage;
 
 import com.insight.base.role.common.dto.FuncPermitDto;
 import com.insight.base.role.common.entity.Role;
-import com.insight.utils.pojo.LoginInfo;
-import com.insight.utils.pojo.MemberDto;
-import com.insight.utils.pojo.Reply;
-import com.insight.utils.pojo.SearchDto;
+import com.insight.utils.pojo.auth.LoginInfo;
+import com.insight.utils.pojo.base.Reply;
+import com.insight.utils.pojo.base.Search;
+import com.insight.utils.pojo.user.MemberDto;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public interface RoleService {
      * @param search 查询实体类
      * @return Reply
      */
-    Reply getRoles(SearchDto search);
+    Reply getRoles(Search search);
 
     /**
      * 获取角色详情
@@ -43,11 +43,10 @@ public interface RoleService {
     /**
      * 查询角色成员用户
      *
-     * @param id     角色ID
      * @param search 查询实体类
      * @return Reply
      */
-    Reply getMemberUsers(Long id, SearchDto search);
+    Reply getMemberUsers(Search search);
 
     /**
      * 获取角色权限
@@ -155,7 +154,7 @@ public interface RoleService {
      * @param search 查询实体类
      * @return Reply
      */
-    Reply getRoleLogs(SearchDto search);
+    Reply getRoleLogs(Search search);
 
     /**
      * 获取日志详情

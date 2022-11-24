@@ -5,7 +5,7 @@ import com.insight.base.role.common.dto.RoleDto;
 import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.CoreMapper;
 import com.insight.utils.SnowflakeCreator;
-import com.insight.utils.pojo.MemberDto;
+import com.insight.utils.pojo.user.MemberDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

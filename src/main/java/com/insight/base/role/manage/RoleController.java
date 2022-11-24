@@ -4,10 +4,10 @@ import com.insight.base.role.common.dto.FuncPermitDto;
 import com.insight.base.role.common.entity.Role;
 import com.insight.utils.Json;
 import com.insight.utils.ReplyHelper;
-import com.insight.utils.pojo.LoginInfo;
-import com.insight.utils.pojo.MemberDto;
-import com.insight.utils.pojo.Reply;
-import com.insight.utils.pojo.SearchDto;
+import com.insight.utils.pojo.auth.LoginInfo;
+import com.insight.utils.pojo.base.Reply;
+import com.insight.utils.pojo.base.Search;
+import com.insight.utils.pojo.user.MemberDto;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -41,9 +41,10 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles")
-    public Reply getRoles(@RequestHeader("loginInfo") String info, SearchDto search) {
+    public Reply getRoles(@RequestHeader("loginInfo") String info, Search search) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
         search.setTenantId(loginInfo.getTenantId());
+        search.setAppId(loginInfo.getAppId());
 
         return service.getRoles(search);
     }
@@ -78,8 +79,9 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/users")
-    public Reply getMemberUsers(@PathVariable Long id, SearchDto search) {
-        return service.getMemberUsers(id, search);
+    public Reply getMemberUsers(@PathVariable Long id, Search search) {
+        search.setId(id);
+        return service.getMemberUsers(search);
     }
 
     /**
@@ -253,7 +255,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/logs")
-    public Reply getRoleLogs(SearchDto search) {
+    public Reply getRoleLogs(Search search) {
         return service.getRoleLogs(search);
     }
 

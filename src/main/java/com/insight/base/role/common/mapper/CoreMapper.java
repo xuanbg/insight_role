@@ -2,7 +2,7 @@ package com.insight.base.role.common.mapper;
 
 import com.insight.base.role.common.dto.FuncPermitDto;
 import com.insight.base.role.common.entity.Role;
-import com.insight.utils.pojo.MemberDto;
+import com.insight.utils.pojo.user.MemberDto;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

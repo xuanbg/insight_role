@@ -2,7 +2,8 @@ package com.insight.base.role.common.mapper;
 
 import com.insight.base.role.common.dto.*;
 import com.insight.base.role.common.entity.Role;
-import com.insight.utils.pojo.MemberDto;
+import com.insight.utils.pojo.base.Search;
+import com.insight.utils.pojo.user.MemberDto;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -18,18 +19,16 @@ public interface RoleMapper {
     /**
      * 获取角色列表
      *
-     * @param tenantId 租户ID
-     * @param appId    应用ID
-     * @param key      查询关键词
+     * @param search      查询关键词
      * @return 角色列表
      */
     @Select("<script>select r.id, r.app_id, a.name as app_name, r.name, r.remark, r.is_builtin from ibr_role r join ibs_application a on a.id = r.app_id where " +
             "<if test = 'tenantId != null'>r.tenant_id = #{tenantId} </if>" +
             "<if test = 'tenantId == null'>r.tenant_id is null </if>" +
             "<if test = 'appId != null'>and r.app_id = #{appId} </if>" +
-            "<if test = 'key != null'>and (r.name like concat('%',#{key},'%') or a.name like concat('%',#{key},'%')) </if>" +
-            "order by r.created_time</script>")
-    List<RoleListDto> getRoles(@Param("tenantId") Long tenantId, @Param("appId") Long appId, @Param("key") String key);
+            "<if test = 'keyword != null'>and (r.name like concat('%',#{keyword},'%') or a.name like concat('%',#{keyword},'%')) </if>" +
+            "</script>")
+    List<RoleListDto> getRoles(Search search);
 
     /**
      * 获取角色详情
@@ -54,14 +53,13 @@ public interface RoleMapper {
     /**
      * 查询角色成员用户
      *
-     * @param id  角色ID
-     * @param key 查询关键词
+     * @param search 查询关键词
      * @return 角色成员用户集合
      */
     @Select("<script>select u.id, u.code, u.name, u.account, u.mobile, u.is_invalid from ibv_user_roles m join ibu_user u on u.id = m.user_id " +
-            "<if test = 'key != null'>and (u.code = #{key} or u.account = #{key} or u.name like concat('%',#{key},'%')) </if>" +
-            "where m.role_id = #{id} order by u.created_time</script>")
-    List<MemberUserDto> getMemberUsers(@Param("id") Long id, @Param("key") String key);
+            "<if test = 'keyword != null'>and (u.code = #{keyword} or u.account = #{keyword} or u.name like concat('%',#{keyword},'%')) </if>" +
+            "where m.role_id = #{id}</script>")
+    List<MemberUserDto> getMemberUsers(Search search);
 
     /**
      * 获取角色功能权限列表

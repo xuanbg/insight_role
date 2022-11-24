@@ -1,16 +1,21 @@
 package com.insight.base.role.manage;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.insight.base.role.common.Core;
 import com.insight.base.role.common.client.LogClient;
 import com.insight.base.role.common.client.LogServiceClient;
-import com.insight.base.role.common.dto.*;
+import com.insight.base.role.common.dto.AppListDto;
+import com.insight.base.role.common.dto.FuncPermitDto;
+import com.insight.base.role.common.dto.RoleMemberDto;
 import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.RoleMapper;
 import com.insight.utils.ReplyHelper;
 import com.insight.utils.SnowflakeCreator;
-import com.insight.utils.pojo.*;
+import com.insight.utils.pojo.OperateType;
+import com.insight.utils.pojo.auth.LoginInfo;
+import com.insight.utils.pojo.base.Reply;
+import com.insight.utils.pojo.base.Search;
+import com.insight.utils.pojo.user.MemberDto;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -51,12 +56,12 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getRoles(SearchDto search) {
-        PageHelper.startPage(search.getPage(), search.getSize());
-        List<RoleListDto> groups = mapper.getRoles(search.getTenantId(), search.getAppId(), search.getKeyword());
-        PageInfo<RoleListDto> pageInfo = new PageInfo<>(groups);
+    public Reply getRoles(Search search) {
+        var page = PageHelper.startPage(search.getPageNum(), search.getPageSize())
+                .setOrderBy(search.getOrderBy()).doSelectPage(() -> mapper.getRoles(search));
 
-        return ReplyHelper.success(groups, pageInfo.getTotal());
+        var total = page.getTotal();
+        return total > 0 ? ReplyHelper.success(page.getResult(), total) : ReplyHelper.resultIsEmpty();
     }
 
     /**
@@ -95,22 +100,21 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 查询角色成员用户
      *
-     * @param id     角色ID
      * @param search 查询实体类
      * @return Reply
      */
     @Override
-    public Reply getMemberUsers(Long id, SearchDto search) {
-        Role role = mapper.getRole(id);
+    public Reply getMemberUsers(Search search) {
+        Role role = mapper.getRole(search.getId());
         if (role == null) {
             return ReplyHelper.fail("ID不存在,未读取数据");
         }
 
-        PageHelper.startPage(search.getPage(), search.getSize());
-        List<MemberUserDto> users = mapper.getMemberUsers(id, search.getKeyword());
-        PageInfo<MemberUserDto> pageInfo = new PageInfo<>(users);
+        var page = PageHelper.startPage(search.getPageNum(), search.getPageSize())
+                .setOrderBy(search.getOrderBy()).doSelectPage(() -> mapper.getMemberUsers(search));
 
-        return ReplyHelper.success(users, pageInfo.getTotal());
+        var total = page.getTotal();
+        return total > 0 ? ReplyHelper.success(page.getResult(), total) : ReplyHelper.resultIsEmpty();
     }
 
     /**
@@ -342,8 +346,8 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getRoleLogs(SearchDto search) {
-        return client.getLogs(BUSINESS, search.getKeyword(), search.getPage(), search.getSize());
+    public Reply getRoleLogs(Search search) {
+        return client.getLogs(BUSINESS, search.getKeyword(), search.getPageNum(), search.getPageSize());
     }
 
     /**

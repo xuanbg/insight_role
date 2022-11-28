@@ -11,10 +11,11 @@ import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.RoleMapper;
 import com.insight.utils.ReplyHelper;
 import com.insight.utils.SnowflakeCreator;
-import com.insight.utils.pojo.OperateType;
 import com.insight.utils.pojo.auth.LoginInfo;
+import com.insight.utils.pojo.base.BusinessException;
 import com.insight.utils.pojo.base.Reply;
 import com.insight.utils.pojo.base.Search;
+import com.insight.utils.pojo.message.OperateType;
 import com.insight.utils.pojo.user.MemberDto;
 import org.springframework.stereotype.Service;
 
@@ -71,13 +72,13 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getRole(Long id) {
+    public Role getRole(Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未读取数据");
+            throw new BusinessException("ID不存在,未读取数据");
         }
 
-        return ReplyHelper.success(role);
+        return role;
     }
 
     /**
@@ -87,14 +88,13 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getMembers(Long id) {
+    public List<MemberDto> getMembers(Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未读取数据");
+            throw new BusinessException("ID不存在,未读取数据");
         }
 
-        List<MemberDto> members = mapper.getMembers(id);
-        return ReplyHelper.success(members);
+        return mapper.getMembers(id);
     }
 
     /**
@@ -107,7 +107,7 @@ public class RoleServiceImpl implements RoleService {
     public Reply getMemberUsers(Search search) {
         Role role = mapper.getRole(search.getId());
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未读取数据");
+            throw new BusinessException("ID不存在,未读取数据");
         }
 
         var page = PageHelper.startPage(search.getPageNum(), search.getPageSize())
@@ -124,14 +124,13 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getFuncPermits(Long id) {
+    public List<FuncPermitDto> getFuncPermits(Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未读取数据");
+            throw new BusinessException("ID不存在,未读取数据");
         }
 
-        List<FuncPermitDto> permits = mapper.getFuncPermits(id);
-        return ReplyHelper.success(permits);
+        return mapper.getFuncPermits(id);
     }
 
     /**
@@ -141,10 +140,8 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getApps(Long tenantId) {
-        List<AppListDto> apps = mapper.getApps(tenantId);
-
-        return ReplyHelper.success(apps);
+    public List<AppListDto> getApps(Long tenantId) {
+        return mapper.getApps(tenantId);
     }
 
     /**
@@ -155,14 +152,13 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getMemberOfUser(Long tenantId, Long id) {
+    public List<RoleMemberDto> getMemberOfUser(Long tenantId, Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未读取数据");
+            throw new BusinessException("ID不存在,未读取数据");
         }
 
-        List<RoleMemberDto> members = mapper.getMemberOfUser(tenantId, id);
-        return ReplyHelper.success(members);
+        return mapper.getMemberOfUser(tenantId, id);
     }
 
     /**
@@ -173,14 +169,13 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getMemberOfGroup(Long tenantId, Long id) {
+    public List<RoleMemberDto> getMemberOfGroup(Long tenantId, Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未读取数据");
+            throw new BusinessException("ID不存在,未读取数据");
         }
 
-        List<RoleMemberDto> members = mapper.getMemberOfGroup(tenantId, id);
-        return ReplyHelper.success(members);
+        return mapper.getMemberOfGroup(tenantId, id);
     }
 
     /**
@@ -191,14 +186,13 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply getMemberOfTitle(Long tenantId, Long id) {
+    public List<RoleMemberDto> getMemberOfTitle(Long tenantId, Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未读取数据");
+            throw new BusinessException("ID不存在,未读取数据");
         }
 
-        List<RoleMemberDto> members = mapper.getMemberOfTitle(tenantId, id);
-        return ReplyHelper.success(members);
+        return mapper.getMemberOfTitle(tenantId, id);
     }
 
     /**
@@ -209,9 +203,9 @@ public class RoleServiceImpl implements RoleService {
      * @return Reply
      */
     @Override
-    public Reply newRole(LoginInfo info, Role dto) {
+    public Long newRole(LoginInfo info, Role dto) {
         if (info.getTenantId() != null && dto.getAppId() == null){
-            return ReplyHelper.invalidParam("appId不能为空");
+            throw new BusinessException("appId不能为空");
         }
 
         Long id = creator.nextId(7);
@@ -224,7 +218,7 @@ public class RoleServiceImpl implements RoleService {
         core.addRole(dto);
         LogClient.writeLog(info, BUSINESS, OperateType.INSERT, id, dto);
 
-        return ReplyHelper.created(id);
+        return id;
     }
 
     /**
@@ -232,24 +226,21 @@ public class RoleServiceImpl implements RoleService {
      *
      * @param info 用户关键信息
      * @param dto  角色DTO
-     * @return Reply
      */
     @Override
-    public Reply editRole(LoginInfo info, Role dto) {
+    public void editRole(LoginInfo info, Role dto) {
         if (info.getTenantId() != null && dto.getAppId() == null){
-            return ReplyHelper.invalidParam("appId不能为空");
+            throw new BusinessException("appId不能为空");
         }
 
         Long id = dto.getId();
         Role role = mapper.getRole(id);
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未更新数据");
+            throw new BusinessException("ID不存在,未更新数据");
         }
 
         mapper.updateRole(dto);
         LogClient.writeLog(info, BUSINESS, OperateType.UPDATE, id, dto);
-
-        return ReplyHelper.success();
     }
 
     /**
@@ -257,19 +248,16 @@ public class RoleServiceImpl implements RoleService {
      *
      * @param info 用户关键信息
      * @param id   角色ID
-     * @return Reply
      */
     @Override
-    public Reply deleteRole(LoginInfo info, Long id) {
+    public void deleteRole(LoginInfo info, Long id) {
         Role role = mapper.getRole(id);
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未删除数据");
+            throw new BusinessException("ID不存在,未删除数据");
         }
 
         mapper.deleteRole(id);
         LogClient.writeLog(info, BUSINESS, OperateType.DELETE, id, role);
-
-        return ReplyHelper.success();
     }
 
     /**
@@ -278,23 +266,20 @@ public class RoleServiceImpl implements RoleService {
      * @param info    用户关键信息
      * @param id      角色ID
      * @param members 角色成员集合
-     * @return Reply
      */
     @Override
-    public Reply addMembers(LoginInfo info, Long id, List<MemberDto> members) {
+    public void addMembers(LoginInfo info, Long id, List<MemberDto> members) {
         Role role = mapper.getRole(id);
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未更新数据");
+            throw new BusinessException("ID不存在,未更新数据");
         }
 
         if (role.getTenantId() == null && role.getBuiltin()) {
-            return ReplyHelper.fail("角色模板不能添加角色成员");
+            throw new BusinessException("角色模板不能添加角色成员");
         }
 
         core.addMembers(id, members);
         LogClient.writeLog(info, BUSINESS, OperateType.INSERT, id, members);
-
-        return ReplyHelper.success();
     }
 
     /**
@@ -303,19 +288,16 @@ public class RoleServiceImpl implements RoleService {
      * @param info   用户关键信息
      * @param id     角色ID
      * @param member 角色成员DTO
-     * @return Reply
      */
     @Override
-    public Reply removeMember(LoginInfo info, Long id, MemberDto member) {
+    public void removeMember(LoginInfo info, Long id, MemberDto member) {
         Role role = mapper.getRole(id);
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未删除数据");
+            throw new BusinessException("ID不存在,未删除数据");
         }
 
         mapper.removeMember(id, member);
         LogClient.writeLog(info, BUSINESS, OperateType.DELETE, id, member);
-
-        return ReplyHelper.success();
     }
 
     /**
@@ -324,19 +306,16 @@ public class RoleServiceImpl implements RoleService {
      * @param info   用户关键信息
      * @param id     角色ID
      * @param permit 角色权限
-     * @return Reply
      */
     @Override
-    public Reply setFuncPermit(LoginInfo info, Long id, FuncPermitDto permit) {
+    public void setFuncPermit(LoginInfo info, Long id, FuncPermitDto permit) {
         Role role = mapper.getRole(id);
         if (role == null) {
-            return ReplyHelper.fail("ID不存在,未更新数据");
+            throw new BusinessException("ID不存在,未更新数据");
         }
 
         core.setFuncPermit(id, permit);
         LogClient.writeLog(info, BUSINESS, OperateType.UPDATE, id, permit);
-
-        return ReplyHelper.success();
     }
 
     /**

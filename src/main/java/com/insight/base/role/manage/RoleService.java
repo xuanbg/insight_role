@@ -1,6 +1,8 @@
 package com.insight.base.role.manage;
 
+import com.insight.base.role.common.dto.AppListDto;
 import com.insight.base.role.common.dto.FuncPermitDto;
+import com.insight.base.role.common.dto.RoleMemberDto;
 import com.insight.base.role.common.entity.Role;
 import com.insight.utils.pojo.auth.LoginInfo;
 import com.insight.utils.pojo.base.Reply;
@@ -30,7 +32,7 @@ public interface RoleService {
      * @param id 角色ID
      * @return Reply
      */
-    Reply getRole(Long id);
+    Role getRole(Long id);
 
     /**
      * 获取角色成员
@@ -38,7 +40,7 @@ public interface RoleService {
      * @param id 角色ID
      * @return Reply
      */
-    Reply getMembers(Long id);
+    List<MemberDto> getMembers(Long id);
 
     /**
      * 查询角色成员用户
@@ -54,7 +56,7 @@ public interface RoleService {
      * @param id 角色ID
      * @return Reply
      */
-    Reply getFuncPermits(Long id);
+    List<FuncPermitDto> getFuncPermits(Long id);
 
     /**
      * 获取角色可选应用列表
@@ -62,7 +64,7 @@ public interface RoleService {
      * @param tenantId 租户ID
      * @return Reply
      */
-    Reply getApps(Long tenantId);
+    List<AppListDto> getApps(Long tenantId);
 
     /**
      * 获取角色可选用户成员
@@ -71,7 +73,7 @@ public interface RoleService {
      * @param id       角色ID
      * @return Reply
      */
-    Reply getMemberOfUser(Long tenantId, Long id);
+    List<RoleMemberDto> getMemberOfUser(Long tenantId, Long id);
 
     /**
      * 获取角色可选用户组成员
@@ -80,7 +82,7 @@ public interface RoleService {
      * @param id       角色ID
      * @return Reply
      */
-    Reply getMemberOfGroup(Long tenantId, Long id);
+    List<RoleMemberDto> getMemberOfGroup(Long tenantId, Long id);
 
     /**
      * 获取角色可选职位成员
@@ -89,7 +91,7 @@ public interface RoleService {
      * @param id       角色ID
      * @return Reply
      */
-    Reply getMemberOfTitle(Long tenantId, Long id);
+    List<RoleMemberDto> getMemberOfTitle(Long tenantId, Long id);
 
     /**
      * 新增角色
@@ -98,25 +100,23 @@ public interface RoleService {
      * @param dto  角色DTO
      * @return Reply
      */
-    Reply newRole(LoginInfo info, Role dto);
+    Long newRole(LoginInfo info, Role dto);
 
     /**
      * 编辑角色
      *
      * @param info 用户关键信息
      * @param dto  角色DTO
-     * @return Reply
      */
-    Reply editRole(LoginInfo info, Role dto);
+    void editRole(LoginInfo info, Role dto);
 
     /**
      * 删除角色
      *
      * @param info 用户关键信息
      * @param id   角色ID
-     * @return Reply
      */
-    Reply deleteRole(LoginInfo info, Long id);
+    void deleteRole(LoginInfo info, Long id);
 
     /**
      * 添加角色成员
@@ -124,9 +124,8 @@ public interface RoleService {
      * @param info    用户关键信息
      * @param id      角色ID
      * @param members 角色成员集合
-     * @return Reply
      */
-    Reply addMembers(LoginInfo info, Long id, List<MemberDto> members);
+    void addMembers(LoginInfo info, Long id, List<MemberDto> members);
 
     /**
      * 移除角色成员
@@ -134,9 +133,8 @@ public interface RoleService {
      * @param info   用户关键信息
      * @param id     角色ID
      * @param member 角色成员DTO
-     * @return Reply
      */
-    Reply removeMember(LoginInfo info, Long id, MemberDto member);
+    void removeMember(LoginInfo info, Long id, MemberDto member);
 
     /**
      * 设置角色权限
@@ -144,9 +142,8 @@ public interface RoleService {
      * @param info   用户关键信息
      * @param id     角色ID
      * @param permit 角色权限
-     * @return Reply
      */
-    Reply setFuncPermit(LoginInfo info, Long id, FuncPermitDto permit);
+    void setFuncPermit(LoginInfo info, Long id, FuncPermitDto permit);
 
     /**
      * 获取日志列表

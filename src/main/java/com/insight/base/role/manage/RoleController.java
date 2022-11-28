@@ -1,10 +1,12 @@
 package com.insight.base.role.manage;
 
+import com.insight.base.role.common.dto.AppListDto;
 import com.insight.base.role.common.dto.FuncPermitDto;
+import com.insight.base.role.common.dto.RoleMemberDto;
 import com.insight.base.role.common.entity.Role;
 import com.insight.utils.Json;
-import com.insight.utils.ReplyHelper;
 import com.insight.utils.pojo.auth.LoginInfo;
+import com.insight.utils.pojo.base.BusinessException;
 import com.insight.utils.pojo.base.Reply;
 import com.insight.utils.pojo.base.Search;
 import com.insight.utils.pojo.user.MemberDto;
@@ -56,7 +58,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}")
-    public Reply getRole(@PathVariable Long id) {
+    public Role getRole(@PathVariable Long id) {
         return service.getRole(id);
     }
 
@@ -67,7 +69,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/members")
-    public Reply getMembers(@PathVariable Long id) {
+    public List<MemberDto> getMembers(@PathVariable Long id) {
         return service.getMembers(id);
     }
 
@@ -91,7 +93,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/funcs")
-    public Reply getFuncPermits(@PathVariable Long id) {
+    public List<FuncPermitDto> getFuncPermits(@PathVariable Long id) {
         return service.getFuncPermits(id);
     }
 
@@ -102,7 +104,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/apps")
-    public Reply getApps(@RequestHeader("loginInfo") String info) {
+    public List<AppListDto> getApps(@RequestHeader("loginInfo") String info) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
         return service.getApps(loginInfo.getTenantId());
@@ -116,7 +118,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/users/other")
-    public Reply getMemberOfUser(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
+    public List<RoleMemberDto> getMemberOfUser(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
         return service.getMemberOfUser(loginInfo.getTenantId(), id);
@@ -130,7 +132,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/groups/other")
-    public Reply getMemberOfGroup(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
+    public List<RoleMemberDto> getMemberOfGroup(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
         return service.getMemberOfGroup(loginInfo.getTenantId(), id);
@@ -144,7 +146,7 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/orgs/other")
-    public Reply getMemberOfTitle(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
+    public List<RoleMemberDto> getMemberOfTitle(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
         return service.getMemberOfTitle(loginInfo.getTenantId(), id);
@@ -158,7 +160,7 @@ public class RoleController {
      * @return Reply
      */
     @PostMapping("/v1.0/roles")
-    public Reply newRole(@RequestHeader("loginInfo") String info, @Valid @RequestBody Role dto) {
+    public Long newRole(@RequestHeader("loginInfo") String info, @Valid @RequestBody Role dto) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
         return service.newRole(loginInfo, dto);
@@ -170,14 +172,13 @@ public class RoleController {
      * @param info 用户关键信息
      * @param id   角色ID
      * @param dto  角色DTO
-     * @return Reply
      */
     @PutMapping("/v1.0/roles/{id}")
-    public Reply editRole(@RequestHeader("loginInfo") String info, @PathVariable Long id, @Valid @RequestBody Role dto) {
+    public void editRole(@RequestHeader("loginInfo") String info, @PathVariable Long id, @Valid @RequestBody Role dto) {
         dto.setId(id);
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
-        return service.editRole(loginInfo, dto);
+        service.editRole(loginInfo, dto);
     }
 
     /**
@@ -185,13 +186,12 @@ public class RoleController {
      *
      * @param info 用户关键信息
      * @param id   角色ID
-     * @return Reply
      */
     @DeleteMapping("/v1.0/roles/{id}")
-    public Reply deleteRole(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
+    public void deleteRole(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
 
-        return service.deleteRole(loginInfo, id);
+        service.deleteRole(loginInfo, id);
     }
 
     /**
@@ -200,16 +200,15 @@ public class RoleController {
      * @param info    用户关键信息
      * @param id      角色ID
      * @param members 角色成员集合
-     * @return Reply
      */
     @PostMapping("/v1.0/roles/{id}/members")
-    public Reply addMembers(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody List<MemberDto> members) {
+    public void addMembers(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody List<MemberDto> members) {
         if (members == null || members.isEmpty()) {
-            return ReplyHelper.invalidParam("请选择需要添加的成员");
+            throw new BusinessException("请选择需要添加的成员");
         }
 
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
-        return service.addMembers(loginInfo, id, members);
+        service.addMembers(loginInfo, id, members);
     }
 
     /**
@@ -218,16 +217,15 @@ public class RoleController {
      * @param info   用户关键信息
      * @param id     角色ID
      * @param member 角色成员DTO
-     * @return Reply
      */
     @DeleteMapping("/v1.0/roles/{id}/members")
-    public Reply removeMember(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody MemberDto member) {
+    public void removeMember(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody MemberDto member) {
         if (member == null) {
-            return ReplyHelper.invalidParam("请选择需要移除的成员");
+            throw new BusinessException("请选择需要移除的成员");
         }
 
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
-        return service.removeMember(loginInfo, id, member);
+        service.removeMember(loginInfo, id, member);
     }
 
     /**
@@ -236,16 +234,15 @@ public class RoleController {
      * @param info   用户关键信息
      * @param id     角色ID
      * @param permit 角色权限
-     * @return Reply
      */
     @PutMapping("/v1.0/roles/{id}/funcs")
-    public Reply setFuncPermits(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody FuncPermitDto permit) {
+    public void setFuncPermits(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody FuncPermitDto permit) {
         if (permit == null) {
-            return ReplyHelper.invalidParam("请选择需要授与的功能权限");
+            throw new BusinessException("请选择需要授与的功能权限");
         }
 
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
-        return service.setFuncPermit(loginInfo, id, permit);
+        service.setFuncPermit(loginInfo, id, permit);
     }
 
     /**

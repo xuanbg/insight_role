@@ -67,19 +67,17 @@ public interface RoleMapper {
      * @param id 角色ID
      * @return 功能权限列表
      */
-    @Select("select t.id, t.parent_id, t.type, t.index, t.name, t.permit from (" +
-            "select a.id, null as parent_id, 0 as type, a.index, a.name, null as permit, a.index as i1, null as i2, null as i3, null as i4 " +
-            "from ibr_role r join ibs_application a on a.id = r.app_id where r.id = #{id} union " +
-            "select n.id, n.app_id as parent_id, n.type, n.index, n.name, null as permit, a.index as i1, n.index as i2, null as i3, null as i4 " +
-            "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
-            "where r.id = #{id} union " +
-            "select m.id, m.parent_id, m.type, m.index, m.name, null as permit, a.index as i1, n.index as i2, m.index as i3, null as i4 " +
-            "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
-            "join ibs_navigator m on m.parent_id = n.id where r.id = #{id} union " +
-            "select f.id, f.nav_id as parent_id, ifnull(p.permit, 2) + 3 as type, f.index, f.name, p.permit, a.index as i1, n.index as i2, m.index as i3, f.index as i4 " +
-            "from ibr_role r join ibs_application a on a.id = r.app_id join ibs_navigator n on n.app_id = a.id and n.parent_id is null " +
-            "join ibs_navigator m on m.parent_id = n.id join ibs_function f on f.nav_id = m.id " +
-            "left join ibr_role_permit p on p.role_id = r.id and p.function_id = f.id where r.id = #{id}) t order by i1, i2, i3, i4;")
+    @Select("with apps as (select a.id, null as parent_id, 0 as type, a.index, a.name, null as permit, a.index as i1, null as i2, " +
+            "null as i3, null as i4, null as i5 from ibr_role r join ibs_application a on a.id = r.app_id where r.id = #{id}), " +
+            "navs as (select n.id, n.app_id as parent_id, n.type, n.index, n.name, null as permit, a.i1, n.index as i2, " +
+            "null as i3, null as i4, null as i5 from apps a join ibs_navigator n on n.app_id = a.id and n.parent_id is null), " +
+            "mods as (select m.id, m.parent_id, m.type, m.index, m.name, null as permit, n.i1, n.i2, " +
+            "m.index as i3, null as i4, null as i5 from navs n join ibs_navigator m on m.parent_id = n.id), " +
+            "funs as (select f.id, f.nav_id as parent_id, ifnull(p.permit, 2) + 3 as type, f.index, f.name, p.permit, m.i1, m.i2, " +
+            "m.i3, f.type as i4, f.index as i5 from mods m join ibs_function f on f.nav_id = m.id " +
+            "left join ibr_role_permit p on p.function_id = f.id and p.role_id = #{id}), " +
+            "tree as (select * from apps union select * from navs union select * from mods union select * from funs) " +
+            "select * from tree order by i1, i2, i3, i4, i5;")
     List<FuncPermitDto> getFuncPermits(Long id);
 
     /**

@@ -46,7 +46,6 @@ public class RoleController {
     public Reply getRoles(@RequestHeader("loginInfo") String info, Search search) {
         LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
         search.setTenantId(loginInfo.getTenantId());
-        search.setAppId(loginInfo.getAppId());
 
         return service.getRoles(search);
     }

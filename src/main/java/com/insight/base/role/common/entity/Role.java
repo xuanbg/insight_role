@@ -44,7 +44,7 @@ public class Role extends BaseXo {
     /**
      * 是否内置
      */
-    private Boolean isBuiltin;
+    private Boolean builtin;
 
     /**
      * 创建人
@@ -110,11 +110,11 @@ public class Role extends BaseXo {
     }
 
     public Boolean getBuiltin() {
-        return isBuiltin;
+        return builtin;
     }
 
     public void setBuiltin(Boolean builtin) {
-        isBuiltin = builtin;
+        this.builtin = builtin;
     }
 
     public String getCreator() {

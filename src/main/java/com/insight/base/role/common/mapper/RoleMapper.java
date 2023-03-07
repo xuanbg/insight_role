@@ -22,7 +22,7 @@ public interface RoleMapper {
      * @param search      查询关键词
      * @return 角色列表
      */
-    @Select("<script>select r.id, r.app_id, a.name as app_name, r.name, r.remark, r.is_builtin from ibr_role r join ibs_application a on a.id = r.app_id where " +
+    @Select("<script>select r.id, r.app_id, a.name as app_name, r.name, r.remark, r.builtin from ibr_role r join ibs_application a on a.id = r.app_id where " +
             "<if test = 'tenantId != null'>r.tenant_id = #{tenantId} </if>" +
             "<if test = 'tenantId == null'>r.tenant_id is null </if>" +
             "<if test = 'appId != null'>and r.app_id = #{appId} </if>" +
@@ -56,7 +56,7 @@ public interface RoleMapper {
      * @param search 查询关键词
      * @return 角色成员用户集合
      */
-    @Select("<script>select u.id, u.code, u.name, u.account, u.mobile, u.is_invalid from ibv_user_roles m join ibu_user u on u.id = m.user_id " +
+    @Select("<script>select u.id, u.code, u.name, u.account, u.mobile, u.invalid from ibv_user_roles m join ibu_user u on u.id = m.user_id " +
             "<if test = 'keyword != null'>and (u.code = #{keyword} or u.account = #{keyword} or u.name like concat('%',#{keyword},'%')) </if>" +
             "where m.role_id = #{id}</script>")
     List<MemberUserDto> getMemberUsers(Search search);
@@ -101,7 +101,7 @@ public interface RoleMapper {
     @Select("<script>select u.id, '1' as parent_id, 1 as type, u.`name`, u.remark from ibu_user u " +
             "<if test = 'tenantId != null'>join ibt_tenant_user r on r.user_id = u.id and r.tenant_id = #{tenantId} </if>" +
             "left join ibr_role_member m on m.member_id = u.id and m.type = 1 and m.role_id = #{roleId} " +
-            "where u.is_invalid = 0 and m.id is null order by u.created_time</script>")
+            "where u.invalid = 0 and m.id is null order by u.created_time</script>")
     List<RoleMemberDto> getMemberOfUser(@Param("tenantId") Long tenantId, @Param("roleId") Long roleId);
 
     /**

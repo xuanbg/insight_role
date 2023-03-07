@@ -21,7 +21,7 @@ public interface CoreMapper {
      * @param appId 应用ID
      * @return 角色模板
      */
-    @Select("select * from ibr_role where app_id = #{appId} and tenant_id is null and is_builtin = 1;")
+    @Select("select * from ibr_role where app_id = #{appId} and tenant_id is null and builtin = 1;")
     List<Role> getTemplates(Long appId);
 
     /**
@@ -38,8 +38,8 @@ public interface CoreMapper {
      *
      * @param role 角色DTO
      */
-    @Insert("insert ibr_role(id, tenant_id, app_id, name, remark, is_builtin, creator, creator_id, created_time) values " +
-            "(#{id}, #{tenantId}, #{appId}, #{name}, #{remark}, #{isBuiltin}, #{creator}, #{creatorId}, #{createdTime});")
+    @Insert("insert ibr_role(id, tenant_id, app_id, name, remark, builtin, creator, creator_id, created_time) values " +
+            "(#{id}, #{tenantId}, #{appId}, #{name}, #{remark}, #{builtin}, #{creator}, #{creatorId}, #{createdTime});")
     void addRole(Role role);
 
     /**

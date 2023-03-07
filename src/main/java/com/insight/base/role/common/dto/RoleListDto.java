@@ -37,7 +37,7 @@ public class RoleListDto extends BaseXo {
     /**
      * 是否内置
      */
-    private Boolean isBuiltin;
+    private Boolean builtin;
 
     public Long getId() {
         return id;
@@ -80,10 +80,10 @@ public class RoleListDto extends BaseXo {
     }
 
     public Boolean getBuiltin() {
-        return isBuiltin;
+        return builtin;
     }
 
     public void setBuiltin(Boolean builtin) {
-        isBuiltin = builtin;
+        this.builtin = builtin;
     }
 }

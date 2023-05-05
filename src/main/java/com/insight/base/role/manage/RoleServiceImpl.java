@@ -58,11 +58,11 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Reply getRoles(Search search) {
-        var page = PageHelper.startPage(search.getPageNum(), search.getPageSize())
-                .setOrderBy(search.getOrderBy()).doSelectPage(() -> mapper.getRoles(search));
-
-        var total = page.getTotal();
-        return total > 0 ? ReplyHelper.success(page.getResult(), total) : ReplyHelper.resultIsEmpty();
+        try (var page = PageHelper.startPage(search.getPageNum(), search.getPageSize()).setOrderBy(search.getOrderBy())
+                .doSelectPage(() -> mapper.getRoles(search))) {
+            var total = page.getTotal();
+            return total > 0 ? ReplyHelper.success(page.getResult(), total) : ReplyHelper.resultIsEmpty();
+        }
     }
 
     /**
@@ -204,15 +204,15 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Long newRole(LoginInfo info, Role dto) {
-        if (info.getTenantId() != null && dto.getAppId() == null){
+        if (info.getTenantId() != null && dto.getAppId() == null) {
             throw new BusinessException("appId不能为空");
         }
 
         Long id = creator.nextId(7);
         dto.setId(id);
         dto.setTenantId(info.getTenantId());
-        dto.setCreator(info.getUserName());
-        dto.setCreatorId(info.getUserId());
+        dto.setCreator(info.getName());
+        dto.setCreatorId(info.getId());
         dto.setCreatedTime(LocalDateTime.now());
 
         core.addRole(dto);
@@ -229,7 +229,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public void editRole(LoginInfo info, Role dto) {
-        if (info.getTenantId() != null && dto.getAppId() == null){
+        if (info.getTenantId() != null && dto.getAppId() == null) {
             throw new BusinessException("appId不能为空");
         }
 

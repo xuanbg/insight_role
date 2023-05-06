@@ -110,7 +110,7 @@ public class Role extends BaseXo {
     }
 
     public Boolean getBuiltin() {
-        return builtin;
+        return builtin != null && builtin;
     }
 
     public void setBuiltin(Boolean builtin) {

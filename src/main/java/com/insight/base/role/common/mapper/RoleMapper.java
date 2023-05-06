@@ -22,12 +22,15 @@ public interface RoleMapper {
      * @param search      查询关键词
      * @return 角色列表
      */
-    @Select("<script>select r.id, r.app_id, a.name as app_name, r.name, r.remark, r.builtin from ibr_role r join ibs_application a on a.id = r.app_id where " +
-            "<if test = 'tenantId != null'>r.tenant_id = #{tenantId} </if>" +
-            "<if test = 'tenantId == null'>r.tenant_id is null </if>" +
-            "<if test = 'appId != null'>and r.app_id = #{appId} </if>" +
-            "<if test = 'keyword != null'>and (r.name like concat('%',#{keyword},'%') or a.name like concat('%',#{keyword},'%')) </if>" +
-            "</script>")
+    @Select("""
+            <script>select r.id, r.app_id, a.name as app_name, r.name, r.remark, r.builtin, r.creator, r.created_time
+            from ibr_role r join ibs_application a on a.id = r.app_id where
+            <if test = 'tenantId != null'>r.tenant_id = #{tenantId}</if>
+            <if test = 'tenantId == null'>r.tenant_id is null</if>
+            <if test = 'appId != null'>and r.app_id = #{appId}</if>
+            <if test = 'keyword != null'>and (r.name like concat('%',#{keyword},'%') or a.name like concat('%',#{keyword},'%'))</if>
+            ;</script>
+            """)
     List<RoleListDto> getRoles(Search search);
 
     /**

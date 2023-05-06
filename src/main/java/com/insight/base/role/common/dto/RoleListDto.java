@@ -2,6 +2,8 @@ package com.insight.base.role.common.dto;
 
 import com.insight.utils.pojo.base.BaseXo;
 
+import java.time.LocalDateTime;
+
 /**
  * @author 宣炳刚
  * @date 2019/12/4
@@ -38,6 +40,16 @@ public class RoleListDto extends BaseXo {
      * 是否内置
      */
     private Boolean builtin;
+
+    /**
+     * 创建人
+     */
+    private String creator;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createdTime;
 
     public Long getId() {
         return id;
@@ -85,5 +97,21 @@ public class RoleListDto extends BaseXo {
 
     public void setBuiltin(Boolean builtin) {
         this.builtin = builtin;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(LocalDateTime createdTime) {
+        this.createdTime = createdTime;
     }
 }

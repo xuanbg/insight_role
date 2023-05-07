@@ -144,20 +144,4 @@ public interface RoleService {
      * @param permit 角色权限
      */
     void setFuncPermit(LoginInfo info, Long id, FuncPermitDto permit);
-
-    /**
-     * 获取日志列表
-     *
-     * @param search 查询实体类
-     * @return Reply
-     */
-    Reply getRoleLogs(Search search);
-
-    /**
-     * 获取日志详情
-     *
-     * @param id 日志ID
-     * @return Reply
-     */
-    Reply getRoleLog(Long id);
 }

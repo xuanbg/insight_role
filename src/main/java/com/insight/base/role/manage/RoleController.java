@@ -1,5 +1,6 @@
 package com.insight.base.role.manage;
 
+import com.insight.base.role.common.client.LogServiceClient;
 import com.insight.base.role.common.dto.AppListDto;
 import com.insight.base.role.common.dto.FuncPermitDto;
 import com.insight.base.role.common.dto.RoleMemberDto;
@@ -10,9 +11,9 @@ import com.insight.utils.pojo.base.BusinessException;
 import com.insight.utils.pojo.base.Reply;
 import com.insight.utils.pojo.base.Search;
 import com.insight.utils.pojo.user.MemberDto;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 /**
@@ -24,14 +25,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/base/role")
 public class RoleController {
+    private final LogServiceClient client;
     private final RoleService service;
 
     /**
      * 构造方法
      *
+     * @param client  Feign客户端
      * @param service 自动注入的Service
      */
-    public RoleController(RoleService service) {
+    public RoleController(LogServiceClient client, RoleService service) {
+        this.client = client;
         this.service = service;
     }
 
@@ -245,24 +249,28 @@ public class RoleController {
     }
 
     /**
-     * 获取日志列表
+     * 查询日志
      *
-     * @param search 查询实体类
-     * @return Reply
+     * @param loginInfo 用户登录信息
+     * @param search    查询条件
+     * @return 日志集合
      */
-    @GetMapping("/v1.0/roles/logs")
-    public Reply getRoleLogs(Search search) {
-        return service.getRoleLogs(search);
+    @GetMapping("/v1.0/apps/{id}/logs")
+    public Reply getAirportLogs(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, Search search) {
+        var info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
+        return client.getLogs(id, "Role", search.getKeyword());
     }
 
     /**
-     * 获取日志详情
+     * 获取日志
      *
-     * @param id 日志ID
-     * @return Reply
+     * @param loginInfo 用户登录信息
+     * @param id        日志ID
+     * @return 日志VO
      */
-    @GetMapping("/v1.0/roles/logs/{id}")
-    public Reply getRoleLog(@PathVariable Long id) {
-        return service.getRoleLog(id);
+    @GetMapping("/v1.0/apps/logs/{id}")
+    public Reply getAirportLog(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id) {
+        var info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
+        return client.getLog(id);
     }
 }

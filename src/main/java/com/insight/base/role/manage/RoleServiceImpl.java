@@ -3,7 +3,6 @@ package com.insight.base.role.manage;
 import com.github.pagehelper.PageHelper;
 import com.insight.base.role.common.Core;
 import com.insight.base.role.common.client.LogClient;
-import com.insight.base.role.common.client.LogServiceClient;
 import com.insight.base.role.common.dto.AppListDto;
 import com.insight.base.role.common.dto.FuncPermitDto;
 import com.insight.base.role.common.dto.RoleMemberDto;
@@ -29,10 +28,9 @@ import java.util.List;
  */
 @Service
 public class RoleServiceImpl implements RoleService {
-    private static final String BUSINESS = "角色管理";
+    private static final String BUSINESS = "Role";
     private final SnowflakeCreator creator;
     private final RoleMapper mapper;
-    private final LogServiceClient client;
     private final Core core;
 
     /**
@@ -40,13 +38,11 @@ public class RoleServiceImpl implements RoleService {
      *
      * @param creator 雪花算法ID生成器
      * @param mapper  RoleMapper
-     * @param client  LogServiceClient
      * @param core    Core
      */
-    public RoleServiceImpl(SnowflakeCreator creator, RoleMapper mapper, LogServiceClient client, Core core) {
+    public RoleServiceImpl(SnowflakeCreator creator, RoleMapper mapper, Core core) {
         this.creator = creator;
         this.mapper = mapper;
-        this.client = client;
         this.core = core;
     }
 
@@ -110,11 +106,11 @@ public class RoleServiceImpl implements RoleService {
             throw new BusinessException("ID不存在,未读取数据");
         }
 
-        var page = PageHelper.startPage(search.getPageNum(), search.getPageSize())
-                .setOrderBy(search.getOrderBy()).doSelectPage(() -> mapper.getMemberUsers(search));
-
-        var total = page.getTotal();
-        return total > 0 ? ReplyHelper.success(page.getResult(), total) : ReplyHelper.resultIsEmpty();
+        try (var page = PageHelper.startPage(search.getPageNum(), search.getPageSize()).setOrderBy(search.getOrderBy())
+                .doSelectPage(() -> mapper.getMemberUsers(search))) {
+            var total = page.getTotal();
+            return total > 0 ? ReplyHelper.success(page.getResult(), total) : ReplyHelper.resultIsEmpty();
+        }
     }
 
     /**
@@ -316,27 +312,5 @@ public class RoleServiceImpl implements RoleService {
 
         core.setFuncPermit(id, permit);
         LogClient.writeLog(info, BUSINESS, OperateType.UPDATE, id, permit);
-    }
-
-    /**
-     * 获取日志列表
-     *
-     * @param search 查询实体类
-     * @return Reply
-     */
-    @Override
-    public Reply getRoleLogs(Search search) {
-        return client.getLogs(BUSINESS, search.getKeyword(), search.getPageNum(), search.getPageSize());
-    }
-
-    /**
-     * 获取日志详情
-     *
-     * @param id 日志ID
-     * @return Reply
-     */
-    @Override
-    public Reply getRoleLog(Long id) {
-        return client.getLog(id);
     }
 }

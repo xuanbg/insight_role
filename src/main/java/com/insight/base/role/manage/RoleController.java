@@ -255,7 +255,7 @@ public class RoleController {
      * @param search    查询条件
      * @return 日志集合
      */
-    @GetMapping("/v1.0/apps/{id}/logs")
+    @GetMapping("/v1.0/roles/{id}/logs")
     public Reply getAirportLogs(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, Search search) {
         var info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
         return client.getLogs(id, "Role", search.getKeyword());
@@ -268,7 +268,7 @@ public class RoleController {
      * @param id        日志ID
      * @return 日志VO
      */
-    @GetMapping("/v1.0/apps/logs/{id}")
+    @GetMapping("/v1.0/roles/logs/{id}")
     public Reply getAirportLog(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id) {
         var info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
         return client.getLog(id);

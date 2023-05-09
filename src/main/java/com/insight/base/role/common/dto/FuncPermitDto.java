@@ -1,5 +1,6 @@
 package com.insight.base.role.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.insight.utils.pojo.base.BaseXo;
 
 /**
@@ -38,6 +39,11 @@ public class FuncPermitDto extends BaseXo {
      * 授权类型:0.拒绝;1.允许
      */
     private Boolean permit;
+
+    @JsonIgnore
+    public Boolean isPermit() {
+        return permit != null && permit && type > 2;
+    }
 
     public Long getId() {
         return id;

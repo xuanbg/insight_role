@@ -5,9 +5,8 @@ import com.insight.base.role.common.dto.RoleDto;
 import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.CoreMapper;
 import com.insight.utils.SnowflakeCreator;
+import com.insight.utils.Util;
 import com.insight.utils.pojo.user.MemberDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +20,6 @@ import java.util.List;
  */
 @Component
 public class Core {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final SnowflakeCreator creator;
     private final CoreMapper mapper;
 
@@ -81,6 +79,27 @@ public class Core {
      */
     public void addRole(Role role) {
         mapper.addRole(role);
+        var permits = role.getFuncPermits();
+        if (Util.isNotEmpty(permits)) {
+            var ids = permits.stream().filter(FuncPermitDto::getPermit).map(FuncPermitDto::getId).toList();
+            mapper.removeDataPermits(role.getId());
+            mapper.addDataPermits(role.getId(), ids);
+        }
+    }
+
+    /**
+     * 编辑角色
+     *
+     * @param role 角色DTO
+     */
+    public void editRole(Role role) {
+        mapper.updateRole(role);
+        var permits = role.getFuncPermits();
+        if (Util.isNotEmpty(permits)) {
+            var ids = permits.stream().filter(FuncPermitDto::getPermit).map(FuncPermitDto::getId).toList();
+            mapper.removeDataPermits(role.getId());
+            mapper.addDataPermits(role.getId(), ids);
+        }
     }
 
     /**

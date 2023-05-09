@@ -1,5 +1,6 @@
 package com.insight.base.role.common.entity;
 
+import com.insight.base.role.common.dto.FuncPermitDto;
 import com.insight.utils.pojo.base.BaseXo;
 
 import java.time.LocalDateTime;
@@ -50,7 +51,7 @@ public class Role extends BaseXo {
     /**
      * 授权功能ID集合
      */
-    private List<Long> funIds;
+    private List<FuncPermitDto> funcPermits;
 
     /**
      * 创建人
@@ -123,12 +124,12 @@ public class Role extends BaseXo {
         this.builtin = builtin;
     }
 
-    public List<Long> getFunIds() {
-        return funIds;
+    public List<FuncPermitDto> getFuncPermits() {
+        return funcPermits;
     }
 
-    public void setFunIds(List<Long> funIds) {
-        this.funIds = funIds;
+    public void setFuncPermits(List<FuncPermitDto> funcPermits) {
+        this.funcPermits = funcPermits;
     }
 
     public String getCreator() {

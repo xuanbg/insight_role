@@ -103,4 +103,31 @@ public interface CoreMapper {
             "<foreach collection = \"list\" item = \"item\" index = \"index\" separator = \",\">" +
             "(#{id}, #{item.id}, #{item.permit})</foreach>;</script>")
     void addFuncPermits(@Param("id") Long id, @Param("list") List<FuncPermitDto> permits);
+
+    /**
+     * 更新角色
+     *
+     * @param role 角色DTO
+     */
+    @Update("update ibr_role set app_id = #{appId}, name = #{name}, remark = #{remark} where id = #{id};")
+    void updateRole(Role role);
+
+    /**
+     * 添加角色数据授权
+     *
+     * @param id      角色ID
+     * @param permits 角色数据授权集合
+     */
+    @Insert("<script>insert ibr_role_permit (role_id, function_id, permit) values " +
+            "<foreach collection = \"permits\" item = \"item\" index = \"index\" separator = \",\">" +
+            "(#{id}, #{item}, 1)</foreach>;</script>")
+    void addDataPermits(Long id, List<Long> permits);
+
+    /**
+     * 移除角色数据授权
+     *
+     * @param id 角色ID
+     */
+    @Delete("delete from ibr_role_permit where role_id = #{id};")
+    void removeDataPermits(Long id);
 }

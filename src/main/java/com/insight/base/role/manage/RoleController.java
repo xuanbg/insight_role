@@ -1,5 +1,6 @@
 package com.insight.base.role.manage;
 
+import com.insight.base.role.common.client.LogClient;
 import com.insight.base.role.common.client.LogServiceClient;
 import com.insight.base.role.common.dto.AppListDto;
 import com.insight.base.role.common.dto.FuncPermitDto;
@@ -10,6 +11,7 @@ import com.insight.utils.pojo.auth.LoginInfo;
 import com.insight.utils.pojo.base.BusinessException;
 import com.insight.utils.pojo.base.Reply;
 import com.insight.utils.pojo.base.Search;
+import com.insight.utils.pojo.message.OperateType;
 import com.insight.utils.pojo.user.MemberDto;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/base/role")
 public class RoleController {
+    private static final String BUSINESS = "Role";
     private final LogServiceClient client;
     private final RoleService service;
 
@@ -42,14 +45,14 @@ public class RoleController {
     /**
      * 查询角色列表
      *
-     * @param info   用户关键信息
-     * @param search 查询实体类
+     * @param loginInfo 用户关键信息
+     * @param search    查询实体类
      * @return Reply
      */
     @GetMapping("/v1.0/roles")
-    public Reply getRoles(@RequestHeader("loginInfo") String info, Search search) {
-        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
-        search.setTenantId(loginInfo.getTenantId());
+    public Reply getRoles(@RequestHeader("loginInfo") String loginInfo, Search search) {
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
+        search.setTenantId(info.getTenantId());
 
         return service.getRoles(search);
     }
@@ -103,149 +106,156 @@ public class RoleController {
     /**
      * 获取角色可选应用列表
      *
-     * @param info 用户关键信息
+     * @param loginInfo 用户关键信息
      * @return Reply
      */
     @GetMapping("/v1.0/apps")
-    public List<AppListDto> getApps(@RequestHeader("loginInfo") String info) {
-        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+    public List<AppListDto> getApps(@RequestHeader("loginInfo") String loginInfo) {
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
 
-        return service.getApps(loginInfo.getTenantId());
+        return service.getApps(info.getTenantId());
     }
 
     /**
      * 获取角色可选用户成员
      *
-     * @param info 用户关键信息
-     * @param id   角色ID
+     * @param loginInfo 用户关键信息
+     * @param id        角色ID
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/users/other")
-    public List<RoleMemberDto> getMemberOfUser(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
-        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+    public List<RoleMemberDto> getMemberOfUser(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id) {
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
 
-        return service.getMemberOfUser(loginInfo.getTenantId(), id);
+        return service.getMemberOfUser(info.getTenantId(), id);
     }
 
     /**
      * 获取角色可选用户组成员
      *
-     * @param info 用户关键信息
-     * @param id   角色ID
+     * @param loginInfo 用户关键信息
+     * @param id        角色ID
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/groups/other")
-    public List<RoleMemberDto> getMemberOfGroup(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
-        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+    public List<RoleMemberDto> getMemberOfGroup(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id) {
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
 
-        return service.getMemberOfGroup(loginInfo.getTenantId(), id);
+        return service.getMemberOfGroup(info.getTenantId(), id);
     }
 
     /**
      * 获取角色可选职位成员
      *
-     * @param info 用户关键信息
-     * @param id   角色ID
+     * @param loginInfo 用户关键信息
+     * @param id        角色ID
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/orgs/other")
-    public List<RoleMemberDto> getMemberOfTitle(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
-        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+    public List<RoleMemberDto> getMemberOfTitle(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id) {
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
 
-        return service.getMemberOfTitle(loginInfo.getTenantId(), id);
+        return service.getMemberOfTitle(info.getTenantId(), id);
     }
 
     /**
      * 新增角色
      *
-     * @param info 用户关键信息
-     * @param dto  角色DTO
+     * @param loginInfo 用户关键信息
+     * @param dto       角色DTO
      * @return Reply
      */
     @PostMapping("/v1.0/roles")
-    public Long newRole(@RequestHeader("loginInfo") String info, @Valid @RequestBody Role dto) {
-        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+    public Long newRole(@RequestHeader("loginInfo") String loginInfo, @Valid @RequestBody Role dto) {
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
 
-        return service.newRole(loginInfo, dto);
+        var id = service.newRole(info, dto);
+        LogClient.writeLog(info, BUSINESS, OperateType.NEW, id, dto);
+        return id;
     }
 
     /**
      * 编辑角色
      *
-     * @param info 用户关键信息
-     * @param id   角色ID
-     * @param dto  角色DTO
+     * @param loginInfo 用户关键信息
+     * @param id        角色ID
+     * @param dto       角色DTO
      */
     @PutMapping("/v1.0/roles/{id}")
-    public void editRole(@RequestHeader("loginInfo") String info, @PathVariable Long id, @Valid @RequestBody Role dto) {
+    public void editRole(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, @Valid @RequestBody Role dto) {
         dto.setId(id);
-        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
 
-        service.editRole(loginInfo, dto);
+        service.editRole(info, dto);
+        LogClient.writeLog(info, BUSINESS, OperateType.EDIT, id, dto);
     }
 
     /**
      * 删除角色
      *
-     * @param info 用户关键信息
-     * @param id   角色ID
+     * @param loginInfo 用户关键信息
+     * @param id        角色ID
      */
     @DeleteMapping("/v1.0/roles/{id}")
-    public void deleteRole(@RequestHeader("loginInfo") String info, @PathVariable Long id) {
-        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
+    public void deleteRole(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id) {
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
 
-        service.deleteRole(loginInfo, id);
+        service.deleteRole(info, id);
+        LogClient.writeLog(info, BUSINESS, OperateType.DELETE, id, null);
     }
 
     /**
      * 添加角色成员
      *
-     * @param info    用户关键信息
-     * @param id      角色ID
-     * @param members 角色成员集合
+     * @param loginInfo 用户关键信息
+     * @param id        角色ID
+     * @param members   角色成员集合
      */
     @PostMapping("/v1.0/roles/{id}/members")
-    public void addMembers(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody List<MemberDto> members) {
+    public void addMembers(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, @RequestBody List<MemberDto> members) {
         if (members == null || members.isEmpty()) {
             throw new BusinessException("请选择需要添加的成员");
         }
 
-        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
-        service.addMembers(loginInfo, id, members);
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
+        service.addMembers(info, id, members);
+        LogClient.writeLog(info, BUSINESS, OperateType.EDIT, id, members);
     }
 
     /**
      * 移除角色成员
      *
-     * @param info   用户关键信息
-     * @param id     角色ID
-     * @param member 角色成员DTO
+     * @param loginInfo 用户关键信息
+     * @param id        角色ID
+     * @param member    角色成员DTO
      */
     @DeleteMapping("/v1.0/roles/{id}/members")
-    public void removeMember(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody MemberDto member) {
+    public void removeMember(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, @RequestBody MemberDto member) {
         if (member == null) {
             throw new BusinessException("请选择需要移除的成员");
         }
 
-        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
-        service.removeMember(loginInfo, id, member);
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
+        service.removeMember(info, id, member);
+        LogClient.writeLog(info, BUSINESS, OperateType.EDIT, id, member);
     }
 
     /**
      * 设置角色权限
      *
-     * @param info   用户关键信息
-     * @param id     角色ID
-     * @param permit 角色权限
+     * @param loginInfo 用户关键信息
+     * @param id        角色ID
+     * @param permit    角色权限
      */
     @PutMapping("/v1.0/roles/{id}/funcs")
-    public void setFuncPermits(@RequestHeader("loginInfo") String info, @PathVariable Long id, @RequestBody FuncPermitDto permit) {
+    public void setFuncPermits(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, @RequestBody FuncPermitDto permit) {
         if (permit == null) {
             throw new BusinessException("请选择需要授与的功能权限");
         }
 
-        LoginInfo loginInfo = Json.toBeanFromBase64(info, LoginInfo.class);
-        service.setFuncPermit(loginInfo, id, permit);
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
+        service.setFuncPermit(info, id, permit);
+        LogClient.writeLog(info, BUSINESS, OperateType.EDIT, id, permit);
     }
 
     /**
@@ -258,7 +268,7 @@ public class RoleController {
     @GetMapping("/v1.0/roles/{id}/logs")
     public Reply getAirportLogs(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, Search search) {
         var info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
-        return client.getLogs(id, "Role", search.getKeyword());
+        return client.getLogs(id, BUSINESS, search.getKeyword());
     }
 
     /**

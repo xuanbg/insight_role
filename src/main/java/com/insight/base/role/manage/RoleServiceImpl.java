@@ -10,6 +10,7 @@ import com.insight.base.role.common.entity.Role;
 import com.insight.base.role.common.mapper.RoleMapper;
 import com.insight.utils.ReplyHelper;
 import com.insight.utils.SnowflakeCreator;
+import com.insight.utils.Util;
 import com.insight.utils.pojo.auth.LoginInfo;
 import com.insight.utils.pojo.base.BusinessException;
 import com.insight.utils.pojo.base.Reply;
@@ -17,6 +18,7 @@ import com.insight.utils.pojo.base.Search;
 import com.insight.utils.pojo.message.OperateType;
 import com.insight.utils.pojo.user.MemberDto;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -212,7 +214,7 @@ public class RoleServiceImpl implements RoleService {
         dto.setCreatedTime(LocalDateTime.now());
 
         core.addRole(dto);
-        LogClient.writeLog(info, BUSINESS, OperateType.INSERT, id, dto);
+        LogClient.writeLog(info, BUSINESS, OperateType.NEW, id, dto);
 
         return id;
     }
@@ -224,6 +226,7 @@ public class RoleServiceImpl implements RoleService {
      * @param dto  角色DTO
      */
     @Override
+    @Transactional
     public void editRole(LoginInfo info, Role dto) {
         if (info.getTenantId() != null && dto.getAppId() == null) {
             throw new BusinessException("appId不能为空");
@@ -235,8 +238,25 @@ public class RoleServiceImpl implements RoleService {
             throw new BusinessException("ID不存在,未更新数据");
         }
 
+        if (dto.getAppId() == null) {
+            dto.setAppId(role.getAppId());
+        }
+
+        if (Util.isEmpty(dto.getName())) {
+            dto.setName(role.getName());
+        }
+
+        if (Util.isEmpty(dto.getRemark())) {
+            dto.setRemark(role.getRemark());
+        }
+
         mapper.updateRole(dto);
-        LogClient.writeLog(info, BUSINESS, OperateType.UPDATE, id, dto);
+        if (Util.isNotEmpty(dto.getFunIds())) {
+            mapper.removeDataPermits(id);
+            mapper.addDataPermits(id, dto.getFunIds());
+        }
+
+        LogClient.writeLog(info, BUSINESS, OperateType.EDIT, id, dto);
     }
 
     /**
@@ -275,7 +295,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         core.addMembers(id, members);
-        LogClient.writeLog(info, BUSINESS, OperateType.INSERT, id, members);
+        LogClient.writeLog(info, BUSINESS, OperateType.EDIT, id, members);
     }
 
     /**
@@ -293,7 +313,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         mapper.removeMember(id, member);
-        LogClient.writeLog(info, BUSINESS, OperateType.DELETE, id, member);
+        LogClient.writeLog(info, BUSINESS, OperateType.EDIT, id, member);
     }
 
     /**
@@ -311,6 +331,6 @@ public class RoleServiceImpl implements RoleService {
         }
 
         core.setFuncPermit(id, permit);
-        LogClient.writeLog(info, BUSINESS, OperateType.UPDATE, id, permit);
+        LogClient.writeLog(info, BUSINESS, OperateType.EDIT, id, permit);
     }
 }

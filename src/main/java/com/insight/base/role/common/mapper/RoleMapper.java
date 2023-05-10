@@ -4,7 +4,10 @@ import com.insight.base.role.common.dto.*;
 import com.insight.base.role.common.entity.Role;
 import com.insight.utils.pojo.base.Search;
 import com.insight.utils.pojo.user.MemberDto;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -19,7 +22,7 @@ public interface RoleMapper {
     /**
      * 获取角色列表
      *
-     * @param search      查询关键词
+     * @param search 查询关键词
      * @return 角色列表
      */
     @Select("""
@@ -84,6 +87,26 @@ public interface RoleMapper {
             select * from tree order by i1, i2, i3, i4, i5;
             """)
     List<FuncPermitDto> getFuncPermits(Long id);
+
+    /**
+     * 获取功能权限列表
+     *
+     * @param id 应用ID
+     * @return 功能权限列表
+     */
+    @Select("""
+            with apps as (select id, null as parent_id, 0 as type, index, name, null as permit, index as i1, null as i2,
+            null as i3, null as i4, null as i5 from ibs_application where id = #{id}),
+            navs as (select n.id, n.app_id as parent_id, n.type, n.index, n.name, null as permit, a.i1, n.index as i2,
+            null as i3, null as i4, null as i5 from apps a join ibs_navigator n on n.app_id = a.id and n.parent_id is null),
+            mods as (select m.id, m.parent_id, m.type, m.index, m.name, null as permit, n.i1, n.i2,
+            m.index as i3, null as i4, null as i5 from navs n join ibs_navigator m on m.parent_id = n.id),
+            funs as (select f.id, f.nav_id as parent_id, 3 as type, f.index, f.name, null as permit, m.i1, m.i2,
+            m.i3, f.type as i4, f.index as i5 from mods m join ibs_function f on f.nav_id = m.id),
+            tree as (select * from apps union select * from navs union select * from mods union select * from funs)
+            select * from tree order by i1, i2, i3, i4, i5;
+            """)
+    List<FuncPermitDto> getFuncs(Long id);
 
     /**
      * 获取角色可选应用列表

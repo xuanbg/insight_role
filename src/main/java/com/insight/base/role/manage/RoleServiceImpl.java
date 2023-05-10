@@ -116,17 +116,18 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 获取角色权限
      *
-     * @param id 角色ID
+     * @param appId 应用ID
+     * @param id    角色ID
      * @return Reply
      */
     @Override
-    public List<FuncPermitDto> getFuncPermits(Long id) {
+    public List<FuncPermitDto> getFuncPermits(Long appId, Long id) {
         Role role = mapper.getRole(id);
         if (id > 0 && role == null) {
             throw new BusinessException("ID不存在,未读取数据");
         }
 
-        return mapper.getFuncPermits(id);
+        return id > 0 ? mapper.getFuncPermits(id) : mapper.getFuncs(appId);
     }
 
     /**

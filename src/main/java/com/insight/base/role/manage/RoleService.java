@@ -53,10 +53,11 @@ public interface RoleService {
     /**
      * 获取角色权限
      *
-     * @param id 角色ID
+     * @param appId 应用ID
+     * @param id    角色ID
      * @return Reply
      */
-    List<FuncPermitDto> getFuncPermits(Long id);
+    List<FuncPermitDto> getFuncPermits(Long appId, Long id);
 
     /**
      * 获取角色可选应用列表

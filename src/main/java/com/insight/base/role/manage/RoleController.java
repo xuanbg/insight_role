@@ -95,12 +95,13 @@ public class RoleController {
     /**
      * 获取角色权限
      *
-     * @param id 角色ID
+     * @param id    角色ID
+     * @param appId 应用ID
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/funcs")
-    public List<FuncPermitDto> getFuncPermits(@PathVariable Long id) {
-        return service.getFuncPermits(id);
+    public List<FuncPermitDto> getFuncPermits(@PathVariable Long id, @RequestParam(required = false) Long appId) {
+        return service.getFuncPermits(appId, id);
     }
 
     /**

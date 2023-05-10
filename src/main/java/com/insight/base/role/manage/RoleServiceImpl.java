@@ -122,7 +122,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<FuncPermitDto> getFuncPermits(Long id) {
         Role role = mapper.getRole(id);
-        if (role == null) {
+        if (id > 0 && role == null) {
             throw new BusinessException("ID不存在,未读取数据");
         }
 

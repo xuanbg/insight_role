@@ -118,9 +118,10 @@ public interface CoreMapper {
      * @param id      角色ID
      * @param permits 角色数据授权集合
      */
-    @Insert("<script>insert ibr_role_permit (role_id, function_id, permit) values " +
-            "<foreach collection = \"permits\" item = \"item\" index = \"index\" separator = \",\">" +
-            "(#{id}, #{item}, 1)</foreach>;</script>")
+    @Insert("""
+            <script>insert ibr_role_permit (role_id, function_id, permit) values
+            <foreach collection = "permits" item = "item" index = "index" separator = ",">(#{id}, #{item}, 1)</foreach>;</script>
+            """)
     void addDataPermits(Long id, List<Long> permits);
 
     /**

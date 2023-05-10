@@ -41,7 +41,7 @@ public class FuncPermitDto extends BaseXo {
     private Boolean permit;
 
     @JsonIgnore
-    public Boolean isPermit() {
+    public Boolean hasPermit() {
         return permit != null && permit && type > 2;
     }
 

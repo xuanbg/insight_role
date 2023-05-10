@@ -79,9 +79,8 @@ public class Core {
      */
     public void addRole(Role role) {
         mapper.addRole(role);
-        var permits = role.getFuncPermits();
-        if (Util.isNotEmpty(permits)) {
-            var ids = permits.stream().filter(FuncPermitDto::isPermit).map(FuncPermitDto::getId).toList();
+        var ids = role.getFuncPermits().stream().filter(FuncPermitDto::hasPermit).map(FuncPermitDto::getId).toList();
+        if (Util.isNotEmpty(ids)) {
             mapper.removeDataPermits(role.getId());
             mapper.addDataPermits(role.getId(), ids);
         }
@@ -94,9 +93,8 @@ public class Core {
      */
     public void editRole(Role role) {
         mapper.updateRole(role);
-        var permits = role.getFuncPermits();
-        if (Util.isNotEmpty(permits)) {
-            var ids = permits.stream().filter(FuncPermitDto::isPermit).map(FuncPermitDto::getId).toList();
+        var ids = role.getFuncPermits().stream().filter(FuncPermitDto::hasPermit).map(FuncPermitDto::getId).toList();
+        if (Util.isNotEmpty(ids)) {
             mapper.removeDataPermits(role.getId());
             mapper.addDataPermits(role.getId(), ids);
         }

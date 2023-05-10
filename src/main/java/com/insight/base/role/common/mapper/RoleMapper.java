@@ -95,7 +95,7 @@ public interface RoleMapper {
      * @return 功能权限列表
      */
     @Select("""
-            with apps as (select id, null as parent_id, 0 as type, index, name, null as permit, index as i1, null as i2,
+            with apps as (select id, null as parent_id, 0 as type, `index`, name, null as permit, `index` as i1, null as i2,
             null as i3, null as i4, null as i5 from ibs_application where id = #{id}),
             navs as (select n.id, n.app_id as parent_id, n.type, n.index, n.name, null as permit, a.i1, n.index as i2,
             null as i3, null as i4, null as i5 from apps a join ibs_navigator n on n.app_id = a.id and n.parent_id is null),

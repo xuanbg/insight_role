@@ -95,13 +95,15 @@ public class RoleController {
     /**
      * 获取角色权限
      *
-     * @param id    角色ID
-     * @param appId 应用ID
+     * @param loginInfo 用户关键信息
+     * @param id        角色ID
+     * @param appId     应用ID
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/funcs")
-    public List<FuncPermitDto> getFuncPermits(@PathVariable Long id, @RequestParam(required = false) Long appId) {
-        return service.getFuncPermits(appId, id);
+    public List<FuncPermitDto> getFuncPermits(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, @RequestParam(required = false) Long appId) {
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
+        return service.getFuncPermits(appId == null ? info.getAppId() : appId, id);
     }
 
     /**

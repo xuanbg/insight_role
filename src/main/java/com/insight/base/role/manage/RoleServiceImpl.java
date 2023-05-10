@@ -73,6 +73,7 @@ public class RoleServiceImpl implements RoleService {
             throw new BusinessException("ID不存在,未读取数据");
         }
 
+        role.setFuncPermits(mapper.getFuncPermits(id));
         return role;
     }
 

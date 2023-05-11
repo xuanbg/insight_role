@@ -49,7 +49,7 @@ public class Role extends BaseXo {
     private Boolean builtin;
 
     /**
-     * 授权功能ID集合
+     * 授权功能集合
      */
     private List<FuncPermitDto> funcPermits;
 

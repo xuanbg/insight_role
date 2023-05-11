@@ -93,9 +93,10 @@ public class Core {
      */
     public void editRole(Role role) {
         mapper.updateRole(role);
+        mapper.removeDataPermits(role.getId());
+
         var ids = role.getFuncPermits().stream().filter(FuncPermitDto::hasPermit).map(FuncPermitDto::getId).toList();
         if (Util.isNotEmpty(ids)) {
-            mapper.removeDataPermits(role.getId());
             mapper.addDataPermits(role.getId(), ids);
         }
     }

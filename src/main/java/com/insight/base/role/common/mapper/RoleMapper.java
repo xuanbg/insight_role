@@ -4,10 +4,7 @@ import com.insight.base.role.common.dto.*;
 import com.insight.base.role.common.entity.Role;
 import com.insight.utils.pojo.base.Search;
 import com.insight.utils.pojo.user.MemberDto;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -44,6 +41,15 @@ public interface RoleMapper {
      */
     @Select("select r.*, a.name from ibr_role r join ibs_application a on a.id = r.app_id where r.id = #{id};")
     Role getRole(Long id);
+
+    /**
+     * 更新角色状态
+     *
+     * @param id     角色ID
+     * @param status 可用状态
+     */
+    @Update("update ibr_role set invalid = #{status} where id = #{id};")
+    void updateRoleStatus(Long id, Boolean status);
 
     /**
      * 获取角色成员

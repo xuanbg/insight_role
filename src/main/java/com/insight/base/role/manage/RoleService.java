@@ -145,4 +145,12 @@ public interface RoleService {
      * @param permit 角色权限
      */
     void setFuncPermit(LoginInfo info, Long id, FuncPermitDto permit);
+
+    /**
+     * 更新角色状态
+     *
+     * @param id     角色ID
+     * @param status 可用状态
+     */
+    void updateRoleStatus(Long id, Boolean status);
 }

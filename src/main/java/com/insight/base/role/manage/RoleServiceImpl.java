@@ -209,7 +209,7 @@ public class RoleServiceImpl implements RoleService {
         Long id = creator.nextId(7);
         dto.setId(id);
         dto.setTenantId(info.getTenantId());
-        if (dto.getAppId() == null){
+        if (dto.getAppId() == null) {
             dto.setAppId(info.getAppId());
         }
 
@@ -324,5 +324,16 @@ public class RoleServiceImpl implements RoleService {
         }
 
         core.setFuncPermit(id, permit);
+    }
+
+    /**
+     * 更新角色状态
+     *
+     * @param id     角色ID
+     * @param status 可用状态
+     */
+    @Override
+    public void updateRoleStatus(Long id, Boolean status) {
+        mapper.updateRoleStatus(id, status);
     }
 }

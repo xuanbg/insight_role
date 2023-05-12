@@ -194,6 +194,34 @@ public class RoleController {
     }
 
     /**
+     * 禁用角色
+     *
+     * @param loginInfo 用户关键信息
+     * @param id        角色ID
+     */
+    @PutMapping("/v1.0/roles/{id}/disable")
+    public void disableRole(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id) {
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
+
+        service.updateRoleStatus(id, true);
+        LogClient.writeLog(info, BUSINESS, OperateType.DISABLE, id, null);
+    }
+
+    /**
+     * 启用角色
+     *
+     * @param loginInfo 用户关键信息
+     * @param id        角色ID
+     */
+    @PutMapping("/v1.0/roles/{id}/enable")
+    public void enableRole(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id) {
+        LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
+
+        service.updateRoleStatus(id, false);
+        LogClient.writeLog(info, BUSINESS, OperateType.ENABLE, id, null);
+    }
+
+    /**
      * 删除角色
      *
      * @param loginInfo 用户关键信息

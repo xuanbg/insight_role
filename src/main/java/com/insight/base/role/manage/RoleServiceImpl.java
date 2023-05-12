@@ -209,6 +209,10 @@ public class RoleServiceImpl implements RoleService {
         Long id = creator.nextId(7);
         dto.setId(id);
         dto.setTenantId(info.getTenantId());
+        if (dto.getAppId() == null){
+            dto.setAppId(info.getAppId());
+        }
+
         dto.setCreator(info.getName());
         dto.setCreatorId(info.getId());
         dto.setCreatedTime(LocalDateTime.now());

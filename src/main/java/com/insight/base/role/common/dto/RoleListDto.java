@@ -42,6 +42,11 @@ public class RoleListDto extends BaseXo {
     private Boolean builtin;
 
     /**
+     * 是否内置
+     */
+    private Boolean invalid;
+
+    /**
      * 创建人
      */
     private String creator;
@@ -97,6 +102,14 @@ public class RoleListDto extends BaseXo {
 
     public void setBuiltin(Boolean builtin) {
         this.builtin = builtin;
+    }
+
+    public Boolean getInvalid() {
+        return invalid;
+    }
+
+    public void setInvalid(Boolean invalid) {
+        this.invalid = invalid;
     }
 
     public String getCreator() {

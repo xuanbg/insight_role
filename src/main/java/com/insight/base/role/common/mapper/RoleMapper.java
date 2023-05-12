@@ -70,23 +70,22 @@ public interface RoleMapper {
     /**
      * 获取角色功能权限列表
      *
-     * @param id 角色ID
+     * @param id     应用ID
+     * @param roleId 角色ID
      * @return 功能权限列表
      */
     @Select("""
-            with apps as (select a.id, null as parent_id, 0 as type, a.index, a.name, null as permit, a.index as i1, null as i2,
-            null as i3, null as i4, null as i5 from ibr_role r join ibs_application a on a.id = r.app_id where r.id = #{id}),
-            navs as (select n.id, n.app_id as parent_id, n.type, n.index, n.name, null as permit, a.i1, n.index as i2,
-            null as i3, null as i4, null as i5 from apps a join ibs_navigator n on n.app_id = a.id and n.parent_id is null),
-            mods as (select m.id, m.parent_id, m.type, m.index, m.name, null as permit, n.i1, n.i2,
-            m.index as i3, null as i4, null as i5 from navs n join ibs_navigator m on m.parent_id = n.id),
-            funs as (select f.id, f.nav_id as parent_id, ifnull(p.permit, 2) + 3 as type, f.index, f.name, p.permit, m.i1, m.i2,
-            m.i3, f.type as i4, f.index as i5 from mods m join ibs_function f on f.nav_id = m.id
-            left join ibr_role_permit p on p.function_id = f.id and p.role_id = #{id}),
-            tree as (select * from apps union select * from navs union select * from mods union select * from funs)
-            select * from tree order by i1, i2, i3, i4, i5;
+            select * from (
+            select id, parent_id, type, `index`, name, null as permit, i1, null as i2, null as i3, null as i4
+            from ibv_auth_navs where parent_id = #{id} union
+            select id, parent_id, type, `index`, name, null as permit, i1, i2, null as i3, null as i4
+            from ibv_auth_mods where app_id = #{id} union
+            select f.id, f.parent_id, f.type, f.`index`, f.name, p.permit, i1, i2, i3, f.`index` as i4
+            from ibv_auth_funs f
+              left join ibr_role_permit p on p.function_id = f.id and p.role_id = #{roleId}
+            where app_id = #{id}) t order by i1, i2, i3, i4;
             """)
-    List<FuncPermitDto> getFuncPermits(Long id);
+    List<FuncPermitDto> getFuncPermits(Long id, Long roleId);
 
     /**
      * 获取功能权限列表
@@ -95,16 +94,10 @@ public interface RoleMapper {
      * @return 功能权限列表
      */
     @Select("""
-            with apps as (select id, null as parent_id, 0 as type, `index`, name, null as permit, `index` as i1, null as i2,
-            null as i3, null as i4, null as i5 from ibs_application where id = #{id}),
-            navs as (select n.id, n.app_id as parent_id, n.type, n.index, n.name, null as permit, a.i1, n.index as i2,
-            null as i3, null as i4, null as i5 from apps a join ibs_navigator n on n.app_id = a.id and n.parent_id is null),
-            mods as (select m.id, m.parent_id, m.type, m.index, m.name, null as permit, n.i1, n.i2,
-            m.index as i3, null as i4, null as i5 from navs n join ibs_navigator m on m.parent_id = n.id),
-            funs as (select f.id, f.nav_id as parent_id, 3 as type, f.index, f.name, null as permit, m.i1, m.i2,
-            m.i3, f.type as i4, f.index as i5 from mods m join ibs_function f on f.nav_id = m.id),
-            tree as (select * from apps union select * from navs union select * from mods union select * from funs)
-            select * from tree order by i1, i2, i3, i4, i5;
+            select * from (select id, parent_id, type, `index`, name, i1, null as i2, null as i3, null as i4 from ibv_auth_navs where parent_id = #{id}
+            union select id, parent_id, type, `index`, name, i1, i2, null as i3, null as i4 from ibv_auth_mods where app_id = #{id}
+            union select f.id, f.parent_id, f.type, f.`index`, f.name, i1, i2, i3, f.`index` as i4 from ibv_auth_funs f where app_id = #{id}) t
+            order by i1, i2, i3, i4;
             """)
     List<FuncPermitDto> getFuncs(Long id);
 

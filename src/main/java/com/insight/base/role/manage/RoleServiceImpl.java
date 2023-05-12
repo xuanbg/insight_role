@@ -73,7 +73,7 @@ public class RoleServiceImpl implements RoleService {
             throw new BusinessException("ID不存在,未读取数据");
         }
 
-        role.setFuncPermits(mapper.getFuncPermits(id));
+        role.setFuncPermits(mapper.getFuncPermits(role.getAppId(), id));
         return role;
     }
 
@@ -127,7 +127,7 @@ public class RoleServiceImpl implements RoleService {
             throw new BusinessException("ID不存在,未读取数据");
         }
 
-        return id > 0 ? mapper.getFuncPermits(id) : mapper.getFuncs(appId);
+        return role == null ? mapper.getFuncs(appId) : mapper.getFuncPermits(role.getAppId(), id);
     }
 
     /**

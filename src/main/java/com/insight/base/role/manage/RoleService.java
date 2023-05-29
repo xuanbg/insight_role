@@ -108,8 +108,9 @@ public interface RoleService {
      *
      * @param info 用户关键信息
      * @param dto  角色DTO
+     * @return 原权限
      */
-    void editRole(LoginInfo info, Role dto);
+    List<FuncPermitDto> editRole(LoginInfo info, Role dto);
 
     /**
      * 删除角色

@@ -226,16 +226,18 @@ public class RoleServiceImpl implements RoleService {
      *
      * @param info 用户关键信息
      * @param dto  角色DTO
+     * @return 原权限
      */
     @Override
     @Transactional
-    public void editRole(LoginInfo info, Role dto) {
+    public List<FuncPermitDto> editRole(LoginInfo info, Role dto) {
         if (info.getTenantId() != null && dto.getAppId() == null) {
             throw new BusinessException("appId不能为空");
         }
 
         Long id = dto.getId();
         Role role = mapper.getRole(id);
+        var permits = mapper.getFuncPermits(info.getAppId(), id);
         if (role == null) {
             throw new BusinessException("ID不存在,未更新数据");
         }
@@ -253,6 +255,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         core.editRole(dto);
+        return permits;
     }
 
     /**

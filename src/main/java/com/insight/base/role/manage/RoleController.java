@@ -16,6 +16,7 @@ import com.insight.utils.pojo.user.MemberDto;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -189,9 +190,11 @@ public class RoleController {
         dto.setId(id);
         LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
 
-        service.editRole(info, dto);
-        LogClient.writeLog(info, BUSINESS, OperateType.EDIT, id, dto);
-    }
+        var permits = service.editRole(info, dto);
+        var map = new HashMap<String, Object>();
+        map.put("before", permits);
+        map.put("after", dto);
+        LogClient.writeLog(info, BUSINESS, OperateType.EDIT, id, map);    }
 
     /**
      * 禁用角色

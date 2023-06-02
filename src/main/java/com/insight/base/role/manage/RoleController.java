@@ -23,7 +23,6 @@ import java.util.List;
  * @date 2019-09-01
  * @remark 角色管理服务控制器
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/base/role")
 public class RoleController {

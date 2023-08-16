@@ -124,13 +124,21 @@ public interface RoleMapper {
      *
      * @param tenantId 租户ID
      * @param roleId   角色ID
+     * @param keyword  关键词
      * @return 用户成员集合
      */
-    @Select("<script>select u.id, '1' as parent_id, 1 as type, u.`name`, u.remark from ibu_user u " +
-            "<if test = 'tenantId != null'>join ibt_tenant_user r on r.user_id = u.id and r.tenant_id = #{tenantId} </if>" +
-            "left join ibr_role_member m on m.member_id = u.id and m.type = 1 and m.role_id = #{roleId} " +
-            "where u.invalid = 0 and m.id is null order by u.created_time</script>")
-    List<RoleMemberDto> getMemberOfUser(@Param("tenantId") Long tenantId, @Param("roleId") Long roleId);
+    @Select("""
+            <script>select u.id, '1' as parent_id, 1 as type, u.`name`, u.remark
+            from ibu_user u
+              <if test = 'tenantId != null'>join ibt_tenant_user r on r.user_id = u.id and r.tenant_id = #{tenantId}</if>
+              left join ibr_role_member m on m.member_id = u.id
+                and m.type = 1 and m.role_id = #{roleId}
+            where u.invalid = 0
+              and m.id is null
+              <if test = 'keyword != null'>and (u.code = #{keyword} or u.account = #{keyword} or u.mobile = #{keyword} or u.name like concat('%', #{keyword}, '%'))</if>
+            order by u.created_time</script>
+            """)
+    List<RoleMemberDto> getMemberOfUser(Long tenantId, Long roleId, String keyword);
 
     /**
      * 获取角色可选用户组成员

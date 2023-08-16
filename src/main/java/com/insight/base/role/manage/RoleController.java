@@ -5,13 +5,13 @@ import com.insight.base.role.common.client.LogServiceClient;
 import com.insight.base.role.common.dto.AppListDto;
 import com.insight.base.role.common.dto.FuncPermitDto;
 import com.insight.base.role.common.dto.RoleMemberDto;
+import com.insight.base.role.common.entity.OperateType;
 import com.insight.base.role.common.entity.Role;
 import com.insight.utils.Json;
 import com.insight.utils.pojo.auth.LoginInfo;
 import com.insight.utils.pojo.base.BusinessException;
 import com.insight.utils.pojo.base.Reply;
 import com.insight.utils.pojo.base.Search;
-import com.insight.base.role.common.entity.OperateType;
 import com.insight.utils.pojo.user.MemberDto;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -123,13 +123,14 @@ public class RoleController {
      *
      * @param loginInfo 用户关键信息
      * @param id        角色ID
+     * @param keyword   关键词
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/users/other")
-    public List<RoleMemberDto> getMemberOfUser(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id) {
+    public List<RoleMemberDto> getMemberOfUser(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, @RequestParam String keyword) {
         LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
 
-        return service.getMemberOfUser(info.getTenantId(), id);
+        return service.getMemberOfUser(info.getTenantId(), id, keyword);
     }
 
     /**

@@ -72,9 +72,10 @@ public interface RoleService {
      *
      * @param tenantId 租户ID
      * @param id       角色ID
+     * @param keyword  关键词
      * @return Reply
      */
-    List<RoleMemberDto> getMemberOfUser(Long tenantId, Long id);
+    List<RoleMemberDto> getMemberOfUser(Long tenantId, Long id, String keyword);
 
     /**
      * 获取角色可选用户组成员

@@ -146,16 +146,17 @@ public class RoleServiceImpl implements RoleService {
      *
      * @param tenantId 租户ID
      * @param id       角色ID
+     * @param keyword  关键词
      * @return Reply
      */
     @Override
-    public List<RoleMemberDto> getMemberOfUser(Long tenantId, Long id) {
+    public List<RoleMemberDto> getMemberOfUser(Long tenantId, Long id, String keyword) {
         Role role = mapper.getRole(id);
         if (role == null) {
             throw new BusinessException("ID不存在,未读取数据");
         }
 
-        return mapper.getMemberOfUser(tenantId, id);
+        return mapper.getMemberOfUser(tenantId, id, keyword);
     }
 
     /**

@@ -127,9 +127,8 @@ public class RoleController {
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/users/other")
-    public List<RoleMemberDto> getMemberOfUser(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, @RequestParam String keyword) {
+    public List<RoleMemberDto> getMemberOfUser(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, @RequestParam(required = false) String keyword) {
         LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
-
         return service.getMemberOfUser(info.getTenantId(), id, keyword);
     }
 

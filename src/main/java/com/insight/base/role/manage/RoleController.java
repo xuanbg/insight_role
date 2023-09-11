@@ -123,13 +123,16 @@ public class RoleController {
      *
      * @param loginInfo 用户关键信息
      * @param id        角色ID
-     * @param keyword   关键词
+     * @param search    查询条件
      * @return Reply
      */
     @GetMapping("/v1.0/roles/{id}/users/other")
-    public List<RoleMemberDto> getMemberOfUser(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, @RequestParam(required = false) String keyword) {
+    public Reply getMemberOfUser(@RequestHeader("loginInfo") String loginInfo, @PathVariable Long id, Search search) {
         LoginInfo info = Json.toBeanFromBase64(loginInfo, LoginInfo.class);
-        return service.getMemberOfUser(info.getTenantId(), id, keyword);
+
+        search.setId(id);
+        search.setTenantId(info.getTenantId());
+        return service.getMemberOfUser(search);
     }
 
     /**

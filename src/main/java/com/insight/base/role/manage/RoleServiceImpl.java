@@ -144,19 +144,21 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 获取角色可选用户成员
      *
-     * @param tenantId 租户ID
-     * @param id       角色ID
-     * @param keyword  关键词
+     * @param search 查询条件
      * @return Reply
      */
     @Override
-    public List<RoleMemberDto> getMemberOfUser(Long tenantId, Long id, String keyword) {
-        Role role = mapper.getRole(id);
+    public Reply getMemberOfUser(Search search) {
+        Role role = mapper.getRole(search.getId());
         if (role == null) {
             throw new BusinessException("ID不存在,未读取数据");
         }
 
-        return mapper.getMemberOfUser(tenantId, id, keyword);
+        try (var page = PageHelper.startPage(search.getPageNum(), search.getPageSize()).setOrderBy(search.getOrderBy())
+                .doSelectPage(() -> mapper.getMemberOfUser(search))) {
+            var total = page.getTotal();
+            return total > 0 ? ReplyHelper.success(page.getResult(), total) : ReplyHelper.resultIsEmpty();
+        }
     }
 
     /**

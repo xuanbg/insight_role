@@ -70,12 +70,10 @@ public interface RoleService {
     /**
      * 获取角色可选用户成员
      *
-     * @param tenantId 租户ID
-     * @param id       角色ID
-     * @param keyword  关键词
+     * @param search 查询条件
      * @return Reply
      */
-    List<RoleMemberDto> getMemberOfUser(Long tenantId, Long id, String keyword);
+    Reply getMemberOfUser(Search search);
 
     /**
      * 获取角色可选用户组成员

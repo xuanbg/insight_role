@@ -122,9 +122,7 @@ public interface RoleMapper {
     /**
      * 获取角色可选用户成员
      *
-     * @param tenantId 租户ID
-     * @param roleId   角色ID
-     * @param keyword  关键词
+     * @param search 查询条件
      * @return 用户成员集合
      */
     @Select("""
@@ -136,9 +134,9 @@ public interface RoleMapper {
             where u.invalid = 0
               and m.id is null
               <if test = 'keyword != null'>and (u.code = #{keyword} or u.account = #{keyword} or u.mobile = #{keyword} or u.name like concat('%', #{keyword}, '%'))</if>
-            order by u.created_time</script>
+            </script>
             """)
-    List<RoleMemberDto> getMemberOfUser(Long tenantId, Long roleId, String keyword);
+    List<RoleMemberDto> getMemberOfUser(Search search);
 
     /**
      * 获取角色可选用户组成员

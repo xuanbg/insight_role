@@ -130,7 +130,7 @@ public interface RoleMapper {
             from ibu_user u
               <if test = 'tenantId != null'>join ibt_tenant_user r on r.user_id = u.id and r.tenant_id = #{tenantId}</if>
               left join ibr_role_member m on m.member_id = u.id
-                and m.type = 1 and m.role_id = #{roleId}
+                and m.type = 1 and m.role_id = #{id}
             where u.invalid = 0
               and m.id is null
               <if test = 'keyword != null'>and (u.code = #{keyword} or u.account = #{keyword} or u.mobile = #{keyword} or u.name like concat('%', #{keyword}, '%'))</if>

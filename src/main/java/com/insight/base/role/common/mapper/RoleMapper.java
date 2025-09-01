@@ -126,7 +126,8 @@ public interface RoleMapper {
      * @return 用户成员集合
      */
     @Select("""
-            <script>select u.id, '1' as parent_id, 1 as type, u.`name`, u.remark
+            <script>
+            select distinct u.id, '1' as parent_id, 1 as type, concat(u.`name`, if(u.type > 1, concat('(', u.code, ')'), concat('(', u.mobile, ')'))) as name, u.remark
             from ibu_user u
               <if test = 'tenantId != null'>join ibt_tenant_user r on r.user_id = u.id and r.tenant_id = #{tenantId}</if>
               left join ibr_role_member m on m.member_id = u.id

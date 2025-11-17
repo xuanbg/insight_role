@@ -158,9 +158,15 @@ public interface RoleMapper {
      * @param roleId   角色ID
      * @return 职位成员集合
      */
-    @Select("select o.id, o.parent_id, o.type, o.`index`, o.`name`, o.remark from ibo_organize o " +
-            "left join ibr_role_member m on m.member_id = o.id and m.type = 3 and m.role_id = #{roleId} " +
-            "where o.tenant_id = #{tenantId} and m.id is null order by o.`index`;")
+    @Select("""
+            select distinct o.id, o.parent_id, o.type, o.`index`, o.`name`, o.remark
+            from ibo_organize o
+              left join ibr_role_member m on m.member_id = o.id
+                and m.type = 3 and m.role_id = #{roleId}
+            where o.tenant_id = #{tenantId}
+              and m.id is null
+            order by o.`index`;
+            """)
     List<RoleMemberDto> getMemberOfTitle(@Param("tenantId") Long tenantId, @Param("roleId") Long roleId);
 
     /**
